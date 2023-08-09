@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
 import streamlit as st
-import pickle
 import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
 
 brasileirao = pd.read_excel('brasileirao2023.xlsx')
 brasileirao = brasileirao[brasileirao['Score_m'].notnull()]
@@ -81,50 +81,6 @@ df_cluster_grupo = df_cluster_sort[['cluster','grupo']]
 tabela_sort = tabela.sort_values(by=['2-P','4-V','9-SG'], ascending=False)
 
 
-
-
-###########################################
-# Criar um dicionário para armazenar as informações de cada rodada
-rodadas_clusters = {
-    'df_cluster': df_cluster,
-    'df_cluster_sort': df_cluster_sort,
-    'df_cluster_grupo': df_cluster_grupo,
-    'tabela_sort': tabela_sort
-}
-
-# Salvar o dicionário em um arquivo usando pickle
-with open('rodadas_clusters.pkl', 'wb') as arquivo:
-    pickle.dump(rodadas_clusters, arquivo)
-
-# Carregar os clusters a partir do arquivo pickle
-with open('rodadas_clusters.pkl', 'rb') as arquivo:
-    rodadas_clusters = pickle.load(arquivo)
-
-# Extrair os dados relevantes do dicionário de clusters
-df_cluster_sort = rodadas_clusters['df_cluster_sort']
-df_cluster_grupo = rodadas_clusters['df_cluster_grupo']
-
-# Criar um gráfico de barras para cada cluster
-for i, row in df_cluster_sort.iterrows():
-    cluster = row['cluster']
-    grupo = row['grupo']
-    
-    # Filtrar os dados da tabela_sort para o cluster atual
-    tabela_sort_cluster = rodadas_clusters['tabela_sort'][rodadas_clusters['tabela_sort']['cluster'] == cluster]
-    
-    # Criar o gráfico de barras
-    fig, ax = plt.subplots()
-    ax.bar(tabela_sort_cluster['1-Time'], tabela_sort_cluster['2-P'])
-    ax.set_title(f'Cluster {cluster}: {grupo}')
-    ax.set_xlabel('Time')
-    ax.set_ylabel('Pontos')
-
-    # Exibir o gráfico no Streamlit
-    st.pyplot(fig)
-
-
-
-
 # Método para retornar a tabela de Classificação.
 def getTabelaClassificacao(bAddClomunCluster = False):
     classificacao = tabela_sort[['1-Time', '2-P', '3-J', '4-V', '5-E', '6-D', '7-GP', '8-GC', '9-SG']]
@@ -138,7 +94,6 @@ def getTabelaClassificacao(bAddClomunCluster = False):
 
 # Método utilizado para criar a tabela de Classificação.
 def createTabelaClassificacao():
-    st.header('Classificação')
     st.subheader('Classificação Brasileirão 2023')
     st.table(getTabelaClassificacao())
 
@@ -154,7 +109,6 @@ def getClassificaoGrupo():
 
 # Método utilizado para criar a tabela de Classificação com Grupo
 def createTableClassificacaoGrupo():
-    st.header('Classificação - Grupo')
     st.subheader('Classificação Brasileirão 2023 - Grupo')
     opcao = st.selectbox(
         'Escolha o Grupo',
