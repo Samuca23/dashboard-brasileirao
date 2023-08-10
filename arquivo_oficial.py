@@ -2,7 +2,10 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 import matplotlib.pyplot as plt
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LinearRegression
+from sklearn.cluster import KMeans
 
 brasileirao = pd.read_excel('brasileirao2023.xlsx')
 brasileirao = brasileirao[brasileirao['Score_m'].notnull()]
@@ -81,8 +84,67 @@ df_cluster_grupo = df_cluster_sort[['cluster','grupo']]
 tabela_sort = tabela.sort_values(by=['2-P','4-V','9-SG'], ascending=False)
 
 
+df_data = tabela[[
+    'cluster',              
+    '2-P',              
+    '4-V',
+    '5-E',
+    '6-D',
+    '9-SG'
+]]
+
+X_Train = df_data.drop(columns=['cluster'], axis=1)
+X_Test = df_data.drop(columns=['cluster'], axis=1)
+y_Train = df_data['cluster']
+y_Test = df_data['cluster']
+
+sc_x = StandardScaler()
+X_Train = sc_x.fit_transform(X_Train)
+X_Test = sc_x.fit_transform(X_Test)
+
+logreg = LogisticRegression(solver="lbfgs", max_iter=500)
+logreg.fit(X_Train, y_Train)
+pred_logreg = logreg.predict(X_Test)
+pred_proba = logreg.predict_proba(X_Test)
+
+tabela["cluster_pred"] = pred_logreg
+
+lista_proba = pred_proba.tolist()
+
+data = []  # Lista para armazenar os dicionários de dados
+
+index = 0
+for proba in lista_proba:
+    for i in range(0, len(proba)):
+        new_row = {"index": index, "prob": i, "valor": round(proba[i], 4)}
+        data.append(new_row)
+    index += 1
+
+df_prob = pd.DataFrame(data)  # Cria o DataFrame a partir da lista de dicionários
+df_prob = df_prob.pivot_table(
+    index="index", columns="prob", values="valor", aggfunc="sum"
+)
+df_prob = df_prob.reset_index()
+df_prob = df_prob.set_index("index")
+
+df_prob = df_prob.rename(columns={
+    0.0: 'cl_o',
+    1.0: 'cl_1',
+    2.0: 'cl_2',
+    3.0: 'cl_3',
+    4.0: 'cl_4'
+})
+
+tabela = pd.merge(tabela, df_prob, left_index=True, right_index=True)
+st.table(tabela)
+
+# Método para retoranar a tabela de Classificação com os Possíveis Clusteres
+def getTabelaClassificacaoClusterPredict():
+    return True
+
+
 # Método para retornar a tabela de Classificação.
-def getTabelaClassificacao(bAddClomunCluster = False):
+def getDadoTabelaClassificacao(bAddClomunCluster = False):
     classificacao = tabela_sort[['1-Time', '2-P', '3-J', '4-V', '5-E', '6-D', '7-GP', '8-GC', '9-SG']]
     classificacao['7-GP'] = classificacao['7-GP'].astype(int)
     classificacao['8-GC'] = classificacao['8-GC'].astype(int)
@@ -95,11 +157,11 @@ def getTabelaClassificacao(bAddClomunCluster = False):
 # Método utilizado para criar a tabela de Classificação.
 def createTabelaClassificacao():
     st.subheader('Classificação Brasileirão 2023')
-    st.table(getTabelaClassificacao())
+    st.table(getDadoTabelaClassificacao())
 
 # Método para retornar a Classificação com os Grupos.
 def getClassificaoGrupo():
-    classificacaoGrupo = getTabelaClassificacao(bAddClomunCluster=True)
+    classificacaoGrupo = getDadoTabelaClassificacao(bAddClomunCluster=True)
     for index, row in classificacaoGrupo.iterrows():
         for _, cluster_grupo in df_cluster_grupo.iterrows():
             if row['Cluster'] == cluster_grupo['cluster']:
