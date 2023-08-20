@@ -7,7 +7,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LinearRegression
 from sklearn.cluster import KMeans
 
-brasileirao = pd.read_excel('brasileirao2023.xlsx')
+brasileirao = pd.read_excel('./data/brasileirao2023.xlsx')
 brasileirao = brasileirao[brasileirao['Score_m'].notnull()]
 
 times = brasileirao['Mandante'].unique()
@@ -136,12 +136,6 @@ df_prob = df_prob.rename(columns={
 })
 
 tabela = pd.merge(tabela, df_prob, left_index=True, right_index=True)
-st.table(tabela)
-
-# Método para retoranar a tabela de Classificação com os Possíveis Clusteres
-def getTabelaClassificacaoClusterPredict():
-    return True
-
 
 # Método para retornar a tabela de Classificação.
 def getDadoTabelaClassificacao(bAddClomunCluster = False):
@@ -154,11 +148,6 @@ def getDadoTabelaClassificacao(bAddClomunCluster = False):
 
     return classificacao
 
-# Método utilizado para criar a tabela de Classificação.
-def createTabelaClassificacao():
-    st.subheader('Classificação Brasileirão 2023')
-    st.table(getDadoTabelaClassificacao())
-
 # Método para retornar a Classificação com os Grupos.
 def getClassificaoGrupo():
     classificacaoGrupo = getDadoTabelaClassificacao(bAddClomunCluster=True)
@@ -168,16 +157,3 @@ def getClassificaoGrupo():
                 classificacaoGrupo.loc[index, 'Grupo'] = cluster_grupo['grupo']
 
     return classificacaoGrupo
-
-# Método utilizado para criar a tabela de Classificação com Grupo
-def createTableClassificacaoGrupo():
-    st.subheader('Classificação Brasileirão 2023 - Grupo')
-    opcao = st.selectbox(
-        'Escolha o Grupo',
-        (df_cluster_grupo['grupo']))
-    classificacaoGrupo = getClassificaoGrupo()
-    st.table(classificacaoGrupo[classificacaoGrupo['Grupo'] == opcao])
-
-
-createTabelaClassificacao()
-createTableClassificacaoGrupo()
