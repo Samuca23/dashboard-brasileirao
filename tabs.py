@@ -1,23 +1,24 @@
 import streamlit as st
+import matplotlib.pyplot as plt
 import pandas as pd
 
-# Criando um DataFrame de exemplo
-data = {
-    "Nome": ["João", "Maria", "Carlos"],
-    "Idade": [25, 30, 22]
-}
-df = pd.DataFrame(data)
-
 def main():
-    st.title("Exemplo de Acesso a Dados de uma Tabela")
+    st.title("Exemplo de Gráfico de Dispersão com Streamlit")
 
-    # Acessando um dado específico
-    nome_primeira_pessoa = df.loc[0, "Nome"]
-    idade_segunda_pessoa = df.loc[1, "Idade"]
+    # Dados de exemplo
+    data = {
+        "Anos": [2010, 2012, 2014, 2016, 2018, 2020],
+        "População": [100, 120, 150, 180, 200, 220]
+    }
+    df = pd.DataFrame(data)
 
-    # Escrevendo os dados usando Markdown
-    st.markdown(f"Nome da primeira pessoa: **{nome_primeira_pessoa}**")
-    st.markdown(f"Idade da segunda pessoa: *{idade_segunda_pessoa}*")
+    # Criando o gráfico de dispersão usando Matplotlib
+    fig, ax = plt.subplots()
+    ax.scatter(df["Anos"], df["População"])
+    ax.set_xlabel("Anos")
+    ax.set_ylabel("População")
+    ax.set_title("Gráfico de Dispersão")
+    st.pyplot(fig)
 
 if __name__ == "__main__":
     main()

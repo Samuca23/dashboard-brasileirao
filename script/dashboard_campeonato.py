@@ -1,5 +1,5 @@
 import streamlit as st
-from dados import tabela_sort, df_cluster_grupo, getTimeFromSigla
+from dados import tabela_sort, df_cluster_grupo, getNomeTimeFromSigla
 
 # Método para retornar a tabela de Classificação.
 def getDadoTabelaClassificacao(bAddClomunCluster = False):
@@ -25,7 +25,7 @@ def getClassificaoGrupo():
 # Método utilizado para criar um painel do possível campeão do campeonato
 def createPainelPossivelCampeao():
     primeiro_colocado = getDadoTabelaClassificacao().iloc[0]
-    nome_primeiro_colocado = getTimeFromSigla(primeiro_colocado['Time'])
+    nome_primeiro_colocado = getNomeTimeFromSigla(primeiro_colocado['Time'])
     st.title("Possível campeão ⭐")
     st.markdown(f"**Time:** {nome_primeiro_colocado}")
     st.markdown(f"**Pontuação: :green`{primeiro_colocado['P']}`**")

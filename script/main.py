@@ -5,11 +5,11 @@ from dashboard_time import createDashboardTime
 def main() :
     tabs = ["Campeonato", "Time"]
     st.sidebar.title("Campeonato Brasileiro 2023 - Série A")
-    selected_tad = st.sidebar.selectbox("Selecione uma visualização", tabs)
+    selected = st.sidebar.selectbox("Selecione uma visualização", tabs)
 
-    if selected_tad == "Campeonato":
+    if selected == "Campeonato":
         createDashboardCampeonato()
-    elif selected_tad == "Time":
+    elif selected == "Time":
        createDashboardTime() 
 
 if __name__ == "__main__":

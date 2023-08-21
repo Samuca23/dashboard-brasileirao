@@ -137,11 +137,30 @@ df_prob = df_prob.rename(columns={
 
 tabela = pd.merge(tabela, df_prob, left_index=True, right_index=True)
 
+# Método responsável por retornar todos os dados do time
+def getDadoTime(sigla):
+    return True
+
+# Método responsável por retornar todos os time do campeonato
+def getAllTimes():
+    times_brasileirao = pd.read_excel('./data/times_brasileirao_2023.xlsx')
+
+    return times_brasileirao
+
 # Método responsável por retornar o nome do time com base na sigla
-def getTimeFromSigla(sigla):
-    times = pd.read_excel('./data/times_brasileirao_2023.xlsx')
+def getNomeTimeFromSigla(sigla):
+    times = getAllTimes()
     
     index_of_sigla = times.index[times['Sigla'] == sigla].tolist()[0]
     nome_time = times.loc[index_of_sigla, 'Time']
     
     return nome_time
+
+# Método responsável por retornar a sigla do time com base no nome
+def getSiglaTimeFromNome(nome):
+    times = getAllTimes()
+    
+    index_of_sigla = times.index[times['Time'] == nome].tolist()[0]
+    sgila_time = times.loc[index_of_sigla, 'Sigla']
+    
+    return sgila_time
