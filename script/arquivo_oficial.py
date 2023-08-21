@@ -37,27 +37,27 @@ for time in times:
         con += partida['Score_m']
         jog += 1
     new_row = pd.DataFrame({
-        '1-Time': [time],
-        '3-J': [jog],
-        '4-V': [vit],
-        '5-E' : [emp],
-        '6-D': [der],
-        '7-GP': [pro],
-        '8-GC': [con]
+        'Time': [time],
+        'J' : [jog],
+        'V' : [vit],
+        'E' : [emp],
+        'D' : [der],
+        'GP': [pro],
+        'GC': [con]
     })   
     tabela = pd.concat([tabela, new_row], ignore_index = True)
     
-tabela['2-P'] = (tabela['4-V'] * 3) + tabela['5-E']
-tabela['9-SG'] = tabela['7-GP'] - tabela['8-GC']   
-tabela_sort = tabela.sort_values(by=['2-P','4-V','9-SG'], ascending=False)
+tabela['P'] = (tabela['V'] * 3) + tabela['E']
+tabela['SG'] = tabela['GP'] - tabela['GC']   
+tabela_sort = tabela.sort_values(by=['P','V','SG'], ascending=False)
 
 from sklearn.cluster import KMeans
 df_data = tabela[[
-    '2-P',              
-    '4-V',
-    '5-E',
-    '6-D',
-    '9-SG'
+    'P',              
+    'V',
+    'E',
+    'D',
+    'SG'
 ]]
 kmeans = KMeans(n_clusters=5, random_state=0).fit(df_data)
 tabela['cluster'] = kmeans.labels_
@@ -68,29 +68,29 @@ for cluster, colunas in enumerate(kmeans.cluster_centers_):
     print(colunas)
     new_row = pd.DataFrame({
         'cluster': [cluster], 
-        '2-P': [colunas[0]],              
-        '4-V': [colunas[1]],
-        '5-E': [colunas[2]],
-        '6-D': [colunas[3]],
-        '9-SG': [colunas[4]],
+        'P': [colunas[0]],              
+        'V': [colunas[1]],
+        'E': [colunas[2]],
+        'D': [colunas[3]],
+        'SG': [colunas[4]],
     })
     df_cluster = pd.concat([df_cluster, new_row], ignore_index=True)
 
-df_cluster_sort = df_cluster.sort_values(by='2-P', ascending=False)
+df_cluster_sort = df_cluster.sort_values(by='P', ascending=False)
 
 df_cluster_sort['grupo'] = ['Título','Libertadores','Sul-Americana','Limbo','Rebaixamento']
 df_cluster_grupo = df_cluster_sort[['cluster','grupo']]
 
-tabela_sort = tabela.sort_values(by=['2-P','4-V','9-SG'], ascending=False)
+tabela_sort = tabela.sort_values(by=['P','V','SG'], ascending=False)
 
 
 df_data = tabela[[
     'cluster',              
-    '2-P',              
-    '4-V',
-    '5-E',
-    '6-D',
-    '9-SG'
+    'P',              
+    'V',
+    'E',
+    'D',
+    'SG'
 ]]
 
 X_Train = df_data.drop(columns=['cluster'], axis=1)
@@ -137,23 +137,11 @@ df_prob = df_prob.rename(columns={
 
 tabela = pd.merge(tabela, df_prob, left_index=True, right_index=True)
 
-# Método para retornar a tabela de Classificação.
-def getDadoTabelaClassificacao(bAddClomunCluster = False):
-    classificacao = tabela_sort[['1-Time', '2-P', '3-J', '4-V', '5-E', '6-D', '7-GP', '8-GC', '9-SG']]
-    classificacao['7-GP'] = classificacao['7-GP'].astype(int)
-    classificacao['8-GC'] = classificacao['8-GC'].astype(int)
-    classificacao['9-SG'] = classificacao['9-SG'].astype(int)
-    if bAddClomunCluster:
-        classificacao['Cluster'] = tabela_sort[['cluster']]
-
-    return classificacao
-
-# Método para retornar a Classificação com os Grupos.
-def getClassificaoGrupo():
-    classificacaoGrupo = getDadoTabelaClassificacao(bAddClomunCluster=True)
-    for index, row in classificacaoGrupo.iterrows():
-        for _, cluster_grupo in df_cluster_grupo.iterrows():
-            if row['Cluster'] == cluster_grupo['cluster']:
-                classificacaoGrupo.loc[index, 'Grupo'] = cluster_grupo['grupo']
-
-    return classificacaoGrupo
+# Método responsável por retornar o nome do time com base na sigla
+def getTimeFromSigla(sigla):
+    times = pd.read_excel('./data/times_brasileirao_2023.xlsx')
+    
+    index_of_sigla = times.index[times['Sigla'] == sigla].tolist()[0]
+    nome_time = times.loc[index_of_sigla, 'Time']
+    
+    return nome_time
