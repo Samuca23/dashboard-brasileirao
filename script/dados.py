@@ -189,13 +189,19 @@ df_prob = df_prob.rename(columns={
     4.0: 'cl_4'
 })
 
-tabela_cluster_pred = pd.merge(tabela, df_prob, left_index=True, right_index=True)
+tabela_clutabelaster_pred = pd.merge(tabela, df_prob, left_index=True, right_index=True)
+
+df_pred = tabela[[
+    'Time',
+    'cl_o',
+    'cl_1',
+    'cl_2',
+    'cl_3',
+    'cl_4',
+]]
+df_pred = df_pred.copy()
 
 ##########################################################
-
-# Método responsável por retornar todos os dados do time
-def getDadoTime(sigla):
-    return True
 
 # Método responsável por retornar todos os time do campeonato
 def getAllTimes():
