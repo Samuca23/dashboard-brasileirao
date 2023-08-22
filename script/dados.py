@@ -137,6 +137,62 @@ df_prob = df_prob.rename(columns={
 
 tabela = pd.merge(tabela, df_prob, left_index=True, right_index=True)
 
+################################################
+df_data = tabela[[
+    'cluster',              
+    'P',              
+    'V',
+    'E',
+    'D',
+    'SG'
+]]
+
+X_Train = df_data.drop(columns=['cluster'], axis=1)
+X_Test = df_data.drop(columns=['cluster'], axis=1)
+y_Train = df_data['cluster']
+y_Test = df_data['cluster']
+
+sc_x = StandardScaler()
+X_Train = sc_x.fit_transform(X_Train)
+X_Test = sc_x.fit_transform(X_Test)
+
+logreg = LogisticRegression(solver="lbfgs", max_iter=500)
+logreg.fit(X_Train, y_Train)
+pred_logreg = logreg.predict(X_Test)
+pred_proba = logreg.predict_proba(X_Test)
+
+tabela["cluster_pred"] = pred_logreg
+
+ista_proba = pred_proba.tolist()
+
+data = []  # Lista para armazenar os dicionários de dados
+
+index = 0
+for proba in lista_proba:
+    for i in range(0, len(proba)):
+        new_row = {"index": index, "prob": i, "valor": round(proba[i], 4)}
+        data.append(new_row)
+    index += 1
+
+df_prob = pd.DataFrame(data)  # Cria o DataFrame a partir da lista de dicionários
+df_prob = df_prob.pivot_table(
+    index="index", columns="prob", values="valor", aggfunc="sum"
+)
+df_prob = df_prob.reset_index()
+df_prob = df_prob.set_index("index")
+
+df_prob = df_prob.rename(columns={
+    0.0: 'cl_o',
+    1.0: 'cl_1',
+    2.0: 'cl_2',
+    3.0: 'cl_3',
+    4.0: 'cl_4'
+})
+
+tabela_cluster_pred = pd.merge(tabela, df_prob, left_index=True, right_index=True)
+
+##########################################################
+
 # Método responsável por retornar todos os dados do time
 def getDadoTime(sigla):
     return True

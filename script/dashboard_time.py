@@ -1,5 +1,5 @@
 import streamlit as st
-from dados import tabela_sort, df_cluster_grupo, getAllTimes, getNomeTimeFromSigla, getDadoTime
+from dados import tabela, tabela_sort, tabela_cluster_pred, df_cluster_grupo, getAllTimes, getNomeTimeFromSigla, getDadoTime
 
 def createSelecboxTime():
     times = getAllTimes()
@@ -10,7 +10,10 @@ def createSelecboxTime():
     selected = st.selectbox("Escolha um time", times_lista)
 
     if selected != opcao_padrao:
-        dadotime = getDadoTime(getNomeTimeFromSigla(selected))
+        selected(getNomeTimeFromSigla(selected))
 
-def createDashboardTime():
+def createDashboardTime(sigla):
+    return True
+
+def mainDashboardTime():
     createSelecboxTime()

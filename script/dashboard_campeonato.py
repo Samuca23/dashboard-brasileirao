@@ -1,5 +1,5 @@
 import streamlit as st
-from dados import tabela_sort, df_cluster_grupo, getNomeTimeFromSigla
+from dados import tabela_sort, tabela, df_cluster_grupo, getNomeTimeFromSigla
 
 # Método para retornar a tabela de Classificação.
 def getDadoTabelaClassificacao(bAddClomunCluster = False):

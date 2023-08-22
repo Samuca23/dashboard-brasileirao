@@ -1,6 +1,6 @@
 import streamlit as st
 from dashboard_campeonato import createDashboardCampeonato
-from dashboard_time import createDashboardTime
+from dashboard_time import mainDashboardTime
 
 def main() :
     tabs = ["Campeonato", "Time"]
@@ -10,7 +10,7 @@ def main() :
     if selected == "Campeonato":
         createDashboardCampeonato()
     elif selected == "Time":
-       createDashboardTime() 
+        mainDashboardTime() 
 
 if __name__ == "__main__":
     main()
