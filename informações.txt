@@ -1,12 +1,14 @@
-gerar a tabela do campeonato brasileiro de 2023 conforme o anexo;
-montar a tabela do campeonato, inclusive para cada rodada, assim poderá ser salvo o ranking de força de cada rodada;
-aplicar clusterização dos dados de cada rodada;
-encontrar os centróides para classificar os grupos;
-aplicar a regressão linear para saber a posição de cada time na rodada final;
-gerar o ranking de forças a cada rodada;
-montar as visualizações das principais informações;
+#1 - gerar a tabela do campeonato brasileiro de 2023 conforme o anexo;
+2 - montar a tabela do campeonato, inclusive para cada rodada, assim poderá ser salvo o ranking de força de cada rodada;
+3 - aplicar clusterização dos dados de cada rodada;
+4 - encontrar os centróides para classificar os grupos;
+5 - aplicar a regressão linear para saber a posição de cada time na rodada final;
+6 - gerar o ranking de forças a cada rodada;
+7 - montar as visualizações das principais informações;
 
-cálculo do ranking: pontos do jogo: pontos da tabela do mandante, pontos da tabela do visitante, valor da pontuação média do centróide do mandante e do visitante, classificação projetada do mandante e visitante na rodada final;
+cálculo do ranking: pontos do jogo: pontos da tabela do mandante, pontos da tabela do visitante, valor da pontuação média do centróide do 
+mandante e do visitante, classificação projetada do mandante e visitante na rodada final;
+
 - conforme o resultado de cada jogo:
 --> vitória do mandante : 75% dos pontos pro mandante e 25% para o visitante;
 --> empate: 40% para o mandante e 60% para o visitante;

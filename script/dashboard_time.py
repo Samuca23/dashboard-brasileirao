@@ -13,6 +13,9 @@ def createSelecboxTime():
         createDashboardTime(getSiglaTimeFromNome(selected))
 
 def createDashboardTime(sigla):
+    montaPainelTime(sigla)
+
+def montaPainelTime(sigla): 
     index_of_sigla = df_pred.index[df_pred['Time'] == sigla].tolist()[0]
     nome_time = getNomeTimeFromSigla(df_pred.loc[index_of_sigla, 'Time'])
     rebaixamento = trataValorDashboardTime(df_pred.loc[index_of_sigla, 'cl_o'])

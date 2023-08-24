@@ -163,7 +163,7 @@ pred_proba = logreg.predict_proba(X_Test)
 
 tabela["cluster_pred"] = pred_logreg
 
-ista_proba = pred_proba.tolist()
+lista_proba = pred_proba.tolist()
 
 data = []  # Lista para armazenar os dicionários de dados
 
@@ -226,3 +226,6 @@ def getSiglaTimeFromNome(nome):
     sgila_time = times.loc[index_of_sigla, 'Sigla']
     
     return sgila_time
+
+def getAllRodadaCampeonato():
+    rodada = brasileirao["Rodada"] 

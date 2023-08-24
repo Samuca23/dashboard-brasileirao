@@ -28,11 +28,12 @@ def createPainelPossivelCampeao():
     nome_primeiro_colocado = getNomeTimeFromSigla(primeiro_colocado['Time'])
     st.title("Possível campeão ⭐")
     st.markdown(f"**Time:** {nome_primeiro_colocado}")
-    st.markdown(f"**Pontuação: :green`{primeiro_colocado['P']}`**")
+    st.markdown(f"**Pontuação: {primeiro_colocado['P']}**")
 
 # Método utilizado para criar a tabela de Classificação
 def createTabelaClassificacao():
     st.subheader('Classificação Brasileirão 2023 - Série A 📜')
+    st.selectbox('Selecione a Rodada', [1,2,3,4,5,6,7,8,9])
     st.table(getDadoTabelaClassificacao())
 
 # Método utilizado para criar a tabela de Classificação com Grupo
