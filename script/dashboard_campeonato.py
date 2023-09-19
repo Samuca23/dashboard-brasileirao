@@ -25,6 +25,7 @@ def getClassificaoGrupo():
 
     return classificacaoGrupo
 
+# Método para criar o painel de dados do campeonato
 def createPainelCampeonato():
     st.subheader("Dados do campeonato")
     card_total_jogo, card_total_gols= st.columns(2)
@@ -37,8 +38,7 @@ def createPainelPrimeiroColocado():
     primeiro_colocado = getDadoTabelaClassificacao().iloc[0]
     nome_primeiro_colocado = getNomeTimeFromSigla(primeiro_colocado['Time'])
     st.subheader("Primeiro colocado ⭐")
-    card_time, card_ponto_time = st.columns(2)
-    card_jogo, card_vitoria = st.columns(2)
+    card_time, card_ponto_time, card_jogo, card_vitoria = st.columns(4)
     card_time.metric('Time', nome_primeiro_colocado)
     card_ponto_time.metric('Pontuação', primeiro_colocado['P'])
     card_jogo.metric('Jogos', primeiro_colocado['J'])

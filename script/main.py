@@ -3,6 +3,7 @@ from dashboard_campeonato import createDashboardCampeonato
 from dashboard_time import mainDashboardTime
 
 def main() :
+    st.set_page_config(layout="wide")
     tabs = ["Campeonato", "Time"]
     st.sidebar.title("Campeonato Brasileiro 2023 - Série A")
     selected = st.sidebar.selectbox("Selecione uma visualização", tabs)
