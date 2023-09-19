@@ -126,7 +126,7 @@ with res:
     )
     if len(st.session_state["data_editor"]["edited_rows"]) > 0:
         if st.button('Salvar dados...'):
-            dados_editados.to_excel('brasileirao2023.xlsx', index=False)
+            dados_editados.to_excel('../data/brasileirao2023.xlsx', index=False)
 with anl:
     cluster, regressao = st.tabs(['Clusterização', 'Regressão'])
     with cluster:

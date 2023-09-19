@@ -1,5 +1,8 @@
 import streamlit as st
-from dados import tabela_sort, tabela, df_cluster_grupo, getNomeTimeFromSigla
+import pandas as pd
+from streamlit_extras.metric_cards import style_metric_cards
+from sklearn.cluster import KMeans
+from dados import tabela_sort, tabela, df_cluster_grupo, getNomeTimeFromSigla, brasileirao
 
 # Método para retornar a tabela de Classificação.
 def getDadoTabelaClassificacao(bAddClomunCluster = False):
@@ -22,18 +25,36 @@ def getClassificaoGrupo():
 
     return classificacaoGrupo
 
+def createPainelCampeonato():
+    st.subheader("Dados do campeonato")
+    card_total_jogo, card_total_gols= st.columns(2)
+    card_total_jogo.metric('Total de Jogos', brasileirao[brasileirao['Score_m'].notnull()]['Rodada'].unique().sum())
+    total_gol = int(brasileirao['Score_m'].sum() + brasileirao['Score_v'].sum())
+    card_total_gols.metric('Total de Gols', total_gol)
+
 # Método utilizado para criar um painel do possível campeão do campeonato
-def createPainelPossivelCampeao():
+def createPainelPrimeiroColocado():
     primeiro_colocado = getDadoTabelaClassificacao().iloc[0]
     nome_primeiro_colocado = getNomeTimeFromSigla(primeiro_colocado['Time'])
-    st.title("Possível campeão ⭐")
-    st.markdown(f"**Time:** {nome_primeiro_colocado}")
-    st.markdown(f"**Pontuação: {primeiro_colocado['P']}**")
+    st.subheader("Primeiro colocado ⭐")
+    card_time, card_ponto_time = st.columns(2)
+    card_jogo, card_vitoria = st.columns(2)
+    card_time.metric('Time', nome_primeiro_colocado)
+    card_ponto_time.metric('Pontuação', primeiro_colocado['P'])
+    card_jogo.metric('Jogos', primeiro_colocado['J'])
+    card_vitoria.metric('Vitórias', primeiro_colocado['V'])
+    style_metric_cards(
+        border_left_color="#15B000",
+        background_color="#F0F2F6",
+        border_size_px=3,
+        border_color = "#CECED0",
+        border_radius_px = 10,
+        box_shadow=True
+    )
 
 # Método utilizado para criar a tabela de Classificação
 def createTabelaClassificacao():
     st.subheader('Classificação Brasileirão 2023 - Série A 📜')
-    st.selectbox('Selecione a Rodada', [1,2,3,4,5,6,7,8,9])
     st.table(getDadoTabelaClassificacao())
 
 # Método utilizado para criar a tabela de Classificação com Grupo
@@ -47,7 +68,7 @@ def createTableClassificacaoGrupo():
 
 # Método utilizado para criar o Dashboard do campeonato
 def createDashboardCampeonato():
-    st.title("Dados do Campeonato Brasileiro 2023 ")
-    createPainelPossivelCampeao()
+    createPainelCampeonato()
+    createPainelPrimeiroColocado()
     createTabelaClassificacao()
     createTableClassificacaoGrupo()
