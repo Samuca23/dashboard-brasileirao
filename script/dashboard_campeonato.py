@@ -28,23 +28,24 @@ def getClassificaoGrupo():
 # Método para criar o painel de dados do campeonato
 def createPainelCampeonato():
     st.subheader("Dados do campeonato")
-    card_total_jogo, card_total_gols= st.columns(2)
-    card_total_jogo.metric('Total de Jogos', brasileirao[brasileirao['Score_m'].notnull()]['Rodada'].unique().sum())
+    card_total_jogo, card_total_gols, card_media_gol, card_total_ponto = st.columns(4)
+    card_primeiro_colocado, card_time_mais_gol = st.columns(2)
     total_gol = int(brasileirao['Score_m'].sum() + brasileirao['Score_v'].sum())
-    card_total_gols.metric('Total de Gols', total_gol)
-
-# Método utilizado para criar um painel do possível campeão do campeonato
-def createPainelPrimeiroColocado():
+    total_ponto = tabela_sort['P'].sum()
+    time_mais_gol = getNomeTimeFromSigla(tabela_sort[tabela_sort['GP'].notnull().sort_values(ascending=False)]['Time'].iloc[0])
     primeiro_colocado = getDadoTabelaClassificacao().iloc[0]
     nome_primeiro_colocado = getNomeTimeFromSigla(primeiro_colocado['Time'])
-    st.subheader("Primeiro colocado ⭐")
-    card_time, card_ponto_time, card_jogo, card_vitoria = st.columns(4)
-    card_time.metric('Time', nome_primeiro_colocado)
-    card_ponto_time.metric('Pontuação', primeiro_colocado['P'])
-    card_jogo.metric('Jogos', primeiro_colocado['J'])
-    card_vitoria.metric('Vitórias', primeiro_colocado['V'])
+    total_rodada_jogada = brasileirao[brasileirao['Score_m'].notnull()]['Rodada'].unique().max()
+    media_gol_rodada = total_gol / total_rodada_jogada
+
+    card_total_jogo.metric('Total de jogos', brasileirao[brasileirao['Score_m'].notnull()]['Rodada'].count())
+    card_total_gols.metric('Total de gols', total_gol)
+    card_media_gol.metric('Média de gol por rodada', round(media_gol_rodada))
+    card_total_ponto.metric('Total de pontos', total_ponto)
+    card_primeiro_colocado.metric('Primeiro colocado', nome_primeiro_colocado)
+    card_time_mais_gol.metric('Time com mais gols', time_mais_gol)
     style_metric_cards(
-        border_left_color="#15B000",
+        border_left_color="#4fb342",
         background_color="#F0F2F6",
         border_size_px=3,
         border_color = "#CECED0",
@@ -69,6 +70,5 @@ def createTableClassificacaoGrupo():
 # Método utilizado para criar o Dashboard do campeonato
 def createDashboardCampeonato():
     createPainelCampeonato()
-    createPainelPrimeiroColocado()
     createTabelaClassificacao()
     createTableClassificacaoGrupo()
