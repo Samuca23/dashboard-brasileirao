@@ -70,7 +70,9 @@ def createTableClassificacaoGrupo():
     classificacaoGrupo = getClassificaoGrupo()
     st.table(classificacaoGrupo[classificacaoGrupo['Grupo'] == opcao])
 
+# Método para criar os gráficos de desempenho dos time durante o campeonato
 def createTableCluster() :
+    st.subheader('Gráficos de desempenho dos times durante o campeonato')
     rodada_inicial = st.slider('Rodada', min_value = 2, max_value = 38)
     clusters = []
     for rodada in range(rodada_inicial, brasileirao[brasileirao['Score_m'].notnull()]['Rodada'].max() + 1):
