@@ -71,7 +71,7 @@ def createTableClassificacaoGrupo():
     st.table(classificacaoGrupo[classificacaoGrupo['Grupo'] == opcao])
 
 def createTableCluster() :
-    rodada_inicial = st.slider('Rodada', value = 5, min_value = 1, max_value = 38)
+    rodada_inicial = st.slider('Rodada', min_value = 2, max_value = 38)
     clusters = []
     for rodada in range(rodada_inicial, brasileirao[brasileirao['Score_m'].notnull()]['Rodada'].max() + 1):
         bra_rodada = brasileirao[brasileirao['Rodada'] <= rodada].copy()
@@ -89,7 +89,7 @@ def createTableCluster() :
     opaco = ['black', 'gray', 'lightgray', 'turquoise', 'steelblue']
 
     st.altair_chart(
-        alt.Chart(clusters, title="Brasileirao").mark_circle(size=200).encode(
+        alt.Chart(clusters, title="Brasileirao - Gráfico 1").mark_circle(size=200).encode(
             x='Rodada:O',
             y = alt.Y("Time:O", sort=colocacao),
             size='sum(Grupo):O',
@@ -102,7 +102,7 @@ def createTableCluster() :
     )
 
     st.altair_chart(
-        alt.Chart(clusters, title="Brasileirao").mark_circle(size=200).encode(
+        alt.Chart(clusters, title="Brasileirao - Gráfico 2").mark_circle(size=200).encode(
             x='Rodada:O',
             y = alt.Y("Time:O", sort=colocacao),
             color=alt.Color('Grupo:O', scale=alt.Scale(domain=domain, range=range_color)),
@@ -112,7 +112,7 @@ def createTableCluster() :
             ]
         )
     )
-    base = alt.Chart(clusters, title="Brasileirao").encode(
+    base = alt.Chart(clusters, title="Brasileirao - Heatmap ponto").encode(
         x = "Rodada:O", y = alt.Y("Time:O", sort=colocacao)
     )
     heatmap = base.mark_rect().encode(
@@ -128,7 +128,7 @@ def createTableCluster() :
     )
     st.altair_chart(heatmap + text)
     st.altair_chart(
-        alt.Chart(clusters, title="Brasileirao").mark_rect().encode(
+        alt.Chart(clusters, title="Brasileirao - Heatmap").mark_rect().encode(
             x = "Rodada:O",
             y = alt.Y("Time:O", sort=colocacao),
             color=alt.Color('Grupo:O', scale=alt.Scale(domain=domain, range=range_color)),
