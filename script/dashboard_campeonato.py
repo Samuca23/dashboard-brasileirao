@@ -1,8 +1,11 @@
 import streamlit as st
 import pandas as pd
+import altair as alt
 from streamlit_extras.metric_cards import style_metric_cards
+from streamlit_vertical_slider import vertical_slider
+from streamlit_card import card
 from sklearn.cluster import KMeans
-from dados import tabela_sort, tabela, df_cluster_grupo, getNomeTimeFromSigla, brasileirao
+from dados import tabela_sort, tabela, df_cluster_grupo, getNomeTimeFromSigla, brasileirao, calcular_tabela, calcular_cluster
 
 # Método para retornar a tabela de Classificação.
 def getDadoTabelaClassificacao(bAddClomunCluster = False):
@@ -67,8 +70,83 @@ def createTableClassificacaoGrupo():
     classificacaoGrupo = getClassificaoGrupo()
     st.table(classificacaoGrupo[classificacaoGrupo['Grupo'] == opcao])
 
+def createTableCluster() :
+    rodada_inicial = st.slider('Rodada', value = 5, min_value = 1, max_value = 38)
+    clusters = []
+    for rodada in range(rodada_inicial, brasileirao[brasileirao['Score_m'].notnull()]['Rodada'].max() + 1):
+        bra_rodada = brasileirao[brasileirao['Rodada'] <= rodada].copy()
+        bra_rodada = bra_rodada[bra_rodada['Score_m'].notnull()]
+        tabela_rodada = calcular_tabela(bra_rodada)
+        tabela_rodada_cluster = calcular_cluster(tabela_rodada)
+        for index, row in tabela_rodada_cluster.iterrows():
+            clusters.insert(len(clusters), [rodada, row['Time'], row['Pontos'], row['Cluster'], row['Ranking']])
+    clusters = pd.DataFrame(clusters, columns = ['Rodada', 'Time', 'Pontos', 'Cluster', 'Grupo'])
+    tabela_atual = calcular_tabela(brasileirao[brasileirao['Score_m'].notnull()])
+    tabela_atual = tabela_atual.sort_values(by=['Pontos','Vit','Saldo'], ascending=False)
+    colocacao = list(tabela_atual['Time'])
+    domain = [1, 2, 3, 4, 5]
+    range_color = ['red', 'orange', 'yellow', 'green', 'blue']
+    opaco = ['black', 'gray', 'lightgray', 'turquoise', 'steelblue']
+
+    st.altair_chart(
+        alt.Chart(clusters, title="Brasileirao").mark_circle(size=200).encode(
+            x='Rodada:O',
+            y = alt.Y("Time:O", sort=colocacao),
+            size='sum(Grupo):O',
+            color=alt.Color('Grupo:O', scale=alt.Scale(domain=domain, range=range_color)),
+            tooltip=[
+                alt.Tooltip("Time", title="Time"),
+                alt.Tooltip("sum(Pontos)", title="Pontos"),
+            ]
+        )
+    )
+
+    st.altair_chart(
+        alt.Chart(clusters, title="Brasileirao").mark_circle(size=200).encode(
+            x='Rodada:O',
+            y = alt.Y("Time:O", sort=colocacao),
+            color=alt.Color('Grupo:O', scale=alt.Scale(domain=domain, range=range_color)),
+            tooltip=[
+                alt.Tooltip("Time", title="Time"),
+                alt.Tooltip("sum(Pontos)", title="Pontos"),
+            ]
+        )
+    )
+    base = alt.Chart(clusters, title="Brasileirao").encode(
+        x = "Rodada:O", y = alt.Y("Time:O", sort=colocacao)
+    )
+    heatmap = base.mark_rect().encode(
+        color=alt.Color('Grupo:O', scale=alt.Scale(domain=domain, range=opaco)),
+    )
+    text = base.mark_text(baseline='middle').encode(
+        text = 'Pontos',
+        color=alt.condition(
+            alt.datum.Grupo < 3,
+            alt.value('white'),
+            alt.value('black')
+        )
+    )
+    st.altair_chart(heatmap + text)
+    st.altair_chart(
+        alt.Chart(clusters, title="Brasileirao").mark_rect().encode(
+            x = "Rodada:O",
+            y = alt.Y("Time:O", sort=colocacao),
+            color=alt.Color('Grupo:O', scale=alt.Scale(domain=domain, range=range_color)),
+            tooltip=[
+                alt.Tooltip("Time", title="Time"),
+                alt.Tooltip("sum(Pontos)", title="Pontos"),
+            ]
+            ).configure_view(
+                step=20,
+                strokeWidth=1
+            ).configure_axis(
+                domain=False
+            )
+        )
+    
 # Método utilizado para criar o Dashboard do campeonato
 def createDashboardCampeonato():
     createPainelCampeonato()
     createTabelaClassificacao()
     createTableClassificacaoGrupo()
+    createTableCluster()

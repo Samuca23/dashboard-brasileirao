@@ -21,8 +21,8 @@ def montaPainelTime(sigla):
     rebaixamento = trataValorDashboardTime(df_pred.loc[index_of_sigla, 'cl_o'])
     sulAmericana = trataValorDashboardTime(df_pred.loc[index_of_sigla, 'cl_1'])
     libertadores = trataValorDashboardTime(df_pred.loc[index_of_sigla, 'cl_2'])
-    limbo = trataValorDashboardTime(df_pred.loc[index_of_sigla, 'cl_3'])
-    titulo = trataValorDashboardTime(df_pred.loc[index_of_sigla, 'cl_4'])
+    limbo = trataValorDashboardTime(df_pred.loc[index_of_sigla, 'cl_4'])
+    titulo = trataValorDashboardTime(df_pred.loc[index_of_sigla, 'cl_3'])
 
     st.markdown(f"Status do **{nome_time}** no campeonato")
     st.markdown(f"**Título:** {titulo}%")
