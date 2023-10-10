@@ -317,7 +317,7 @@ def calcular_cluster(df):
 
   return df
 
-def calcular_regressao():
+def calcula_pontuacao_regressao():
     rodadas = brasileirao['Rodada'].unique()
     times = brasileirao['Mandante'].unique()
     pontuacao = pd.DataFrame()
@@ -355,6 +355,11 @@ def calcular_regressao():
     pt_pontuacao_cum = pt_pontuacao.cumsum()
     pt_pontuacao_cum = pt_pontuacao_cum.reset_index()
 
+    return pt_pontuacao_cum
+
+
+def calcular_regressao():
+    pt_pontuacao_cum = calcula_pontuacao_regressao()
     colunas = pt_pontuacao_cum.columns
     df_regressao = pd.DataFrame()
     data_regressao = []  # Lista para armazenar os dicionários de resultados de regressão
@@ -377,4 +382,32 @@ def calcular_regressao():
             data_regressao.append(new_row_regressao)
     df_regressao = pd.DataFrame(data_regressao)
     
+    return df_regressao.sort_values(by='pontuacao_final', ascending=False)
+
+def calcula_regressao_meio_campeonato():
+    pt_pontuacao_cum = calcula_pontuacao_regressao()
+    pontuacao_2 = pt_pontuacao_cum[pt_pontuacao_cum['rodada'] > 19]
+    colunas = pontuacao_2.columns
+    df_regressao = pd.DataFrame()
+    colunas = pontuacao_2.columns
+    regressao_data = []
+
+    for coluna in colunas:
+        if coluna != 'rodada':
+            X = pontuacao_2['rodada'].values.reshape(-1, 1)
+            y = pontuacao_2[coluna].values.reshape(-1, 1)
+            regressor = LinearRegression()
+            regressor.fit(X, y)
+            A = regressor.intercept_[0]
+            B = regressor.coef_[0][0]
+            x = A + (B * 38)
+            regressao_data.append({
+                'time': coluna,
+                'intercept': round(A, 2),
+                'slope': round(B, 2),
+                'pontuacao_final': round(x, 2)
+            })
+
+    df_regressao = pd.DataFrame(regressao_data)
+
     return df_regressao.sort_values(by='pontuacao_final', ascending=False)

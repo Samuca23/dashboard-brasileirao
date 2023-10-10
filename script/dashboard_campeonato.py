@@ -6,7 +6,7 @@ from streamlit_extras.metric_cards import style_metric_cards
 from streamlit_vertical_slider import vertical_slider
 from streamlit_card import card
 from sklearn.cluster import KMeans
-from dados import tabela_sort, tabela, df_cluster_grupo, getNomeTimeFromSigla, brasileirao, calcular_tabela, calcular_cluster, calcular_regressao
+from dados import tabela_sort, tabela, df_cluster_grupo, getNomeTimeFromSigla, brasileirao, calcular_tabela, calcular_cluster, calcular_regressao, calcula_regressao_meio_campeonato
 
 # Método para retornar a tabela de Classificação.
 def getDadoTabelaClassificacao(bAddClomunCluster = False):
@@ -195,10 +195,33 @@ def createTabelaRegressao():
             "pontuacao_final": st.column_config.Column(
                 "Pontuação")
         })
+    
+def createTabelaRegressaoMeioCampeonato():
+    dadoTabelaClassificacao = calcula_regressao_meio_campeonato()
+
+    iClassificacao = 0
+    for i in dadoTabelaClassificacao['time']:
+        iClassificacao += 1
+        dadoTabelaClassificacao.loc[dadoTabelaClassificacao['time'] == i, 'Classificação'] = f"{iClassificacao}º"
+
+    dadoTabelaClassificacao = dadoTabelaClassificacao[['Classificação', 'time', 'pontuacao_final', 'intercept', 'slope']]
+    st.dataframe(
+        dadoTabelaClassificacao,
+        height=750, 
+        hide_index=True,
+        use_container_width=True,
+        column_config={
+            "time": st.column_config.Column(
+                "Time"),
+            "pontuacao_final": st.column_config.Column(
+                "Pontuação")
+        })
 
 def createAreaRegressao(): 
     st.subheader('Tabela de pontos finais - Regressão')
     createTabelaRegressao()
+    st.subheader('Tabela de pontos finais com dados da rodade 19 em diante - Regressão')
+    createTabelaRegressaoMeioCampeonato()
     
 # Método utilizado para criar o Dashboard do campeonato
 def createDashboardCampeonato():
