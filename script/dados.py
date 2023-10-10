@@ -353,6 +353,7 @@ def calcular_regressao():
 
     pt_pontuacao = pontuacao.pivot_table(index='rodada', columns='time', values='pontos', aggfunc='sum')
     pt_pontuacao_cum = pt_pontuacao.cumsum()
+    pt_pontuacao_cum = pt_pontuacao_cum.reset_index()
 
     colunas = pt_pontuacao_cum.columns
     df_regressao = pd.DataFrame()
@@ -369,11 +370,11 @@ def calcular_regressao():
             x = A + (B * 38)
             new_row_regressao = {
                 'time': coluna,
+                'pontuacao_final': round(x),
                 'intercept': round(A, 2),
-                'slope': round(B, 2),
-                'pontuacao_final': round(x, 2)
+                'slope': round(B, 2)
             }
             data_regressao.append(new_row_regressao)
-
     df_regressao = pd.DataFrame(data_regressao)
-    df_regressao.sort_values(by='pontuacao_final', ascending=False)
+    
+    return df_regressao.sort_values(by='pontuacao_final', ascending=False)

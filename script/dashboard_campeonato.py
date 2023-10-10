@@ -60,9 +60,17 @@ def createPainelCampeonato():
 # Método utilizado para criar a tabela de Classificação
 def createTabelaClassificacao():
     st.subheader('Classificação Brasileirão 2023 - Série A 📜')
-    vit_max = int(getDadoTabelaClassificacao()['V'].max())
+    dadoTabelaClassificacao = getDadoTabelaClassificacao()
+
+    iClassificacao = 0
+    for i in dadoTabelaClassificacao['Time']:
+        iClassificacao += 1
+        dadoTabelaClassificacao.loc[dadoTabelaClassificacao['Time'] == i, 'Classificação'] = f"{iClassificacao}º"
+        
+    vit_max = int(dadoTabelaClassificacao['V'].max())
+    dadoTabelaClassificacao = dadoTabelaClassificacao[['Classificação', 'Time', 'P', 'J', 'V', 'E', 'D', 'GP', 'GC', 'SG']]
     st.dataframe(
-        getDadoTabelaClassificacao(), 
+        dadoTabelaClassificacao, 
         height=750, 
         hide_index=True,
         use_container_width=True,
@@ -160,10 +168,31 @@ def createTableCluster() :
                 domain=False
             )
         )
-
+  
 def createTabelaRegressao():
-    st.table('Regressão', calcular_regressao())
+    dadoTabelaClassificacao = calcular_regressao()
 
+    iClassificacao = 0
+    for i in dadoTabelaClassificacao['time']:
+        iClassificacao += 1
+        dadoTabelaClassificacao.loc[dadoTabelaClassificacao['time'] == i, 'Classificação'] = f"{iClassificacao}º"
+
+    dadoTabelaClassificacao = dadoTabelaClassificacao[['Classificação', 'time', 'pontuacao_final', 'intercept', 'slope']]
+    st.dataframe(
+        dadoTabelaClassificacao,
+        height=750, 
+        hide_index=True,
+        use_container_width=True,
+        column_config={
+            "time": st.column_config.Column(
+                "Time"),
+            "pontuacao_final": st.column_config.Column(
+                "Pontuação")
+        })
+
+def createAreaRegressao(): 
+    st.subheader('Tabela de pontos finais - Regressão')
+    createTabelaRegressao()
     
 # Método utilizado para criar o Dashboard do campeonato
 def createDashboardCampeonato():
@@ -171,4 +200,4 @@ def createDashboardCampeonato():
     createTabelaClassificacao()
     createTableClassificacaoGrupo()
     createTableCluster()
-    createTabelaRegressao()
+    createAreaRegressao()
