@@ -113,7 +113,9 @@ def createTableCluster() :
     range_color = ['red', 'orange', 'yellow', 'green', 'blue']
     opaco = ['black', 'gray', 'lightgray', 'turquoise', 'steelblue']
 
-    st.altair_chart(
+    grafico_circle_1, grafico_circle_2 = st.columns(2)
+
+    grafico_circle_1.altair_chart(
         alt.Chart(clusters, title="Brasileirao - Gráfico 1").mark_circle(size=200).encode(
             x='Rodada:O',
             y = alt.Y("Time:O", sort=colocacao),
@@ -126,7 +128,7 @@ def createTableCluster() :
         )
     )
 
-    st.altair_chart(
+    grafico_circle_2.altair_chart(
         alt.Chart(clusters, title="Brasileirao - Gráfico 2").mark_circle(size=200).encode(
             x='Rodada:O',
             y = alt.Y("Time:O", sort=colocacao),
@@ -151,8 +153,12 @@ def createTableCluster() :
             alt.value('black')
         )
     )
-    st.altair_chart(heatmap + text)
-    st.altair_chart(
+
+    heatmap_no_ponit, heatmap_ponit = st.columns(2)
+
+    heatmap_ponit.altair_chart(heatmap + text)
+
+    heatmap_no_ponit.altair_chart(
         alt.Chart(clusters, title="Brasileirao - Heatmap").mark_rect().encode(
             x = "Rodada:O",
             y = alt.Y("Time:O", sort=colocacao),
