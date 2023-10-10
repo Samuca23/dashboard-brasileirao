@@ -316,3 +316,64 @@ def calcular_cluster(df):
   df = df.merge(cl, on='Cluster', how='left')
 
   return df
+
+def calcular_regressao():
+    rodadas = brasileirao['Rodada'].unique()
+    times = brasileirao['Mandante'].unique()
+    pontuacao = pd.DataFrame()
+    data = []  # Lista para armazenar os dicionários de dados
+
+    for rodada in rodadas:
+        for time in times:
+            resultado = brasileirao[(brasileirao['Rodada'] == rodada) & ((brasileirao['Mandante'] == time) | (brasileirao['Visitante'] == time))]
+            if len(resultado) > 0:
+                resultado = resultado.reset_index()
+                if resultado['Mandante'][0] == time:
+                    if resultado['Score_m'][0] > resultado['Score_v'][0]:
+                        pontos = 3
+                    elif resultado['Score_m'][0] == resultado['Score_v'][0]:
+                        pontos = 1
+                    else:
+                        pontos = 0
+                else:                  
+                    if resultado['Score_v'][0] > resultado['Score_m'][0]:
+                        pontos = 3
+                    elif resultado['Score_v'][0] == resultado['Score_m'][0]:
+                        pontos = 1
+                    else:
+                        pontos = 0
+                new_row = {
+                    'time': time,
+                    'rodada': rodada,
+                    'pontos': pontos
+                }        
+                data.append(new_row)  # Adiciona o dicionário à lista de dados
+
+    pontuacao = pd.DataFrame(data)  # Cria o DataFrame a partir da lista de dicionários
+
+    pt_pontuacao = pontuacao.pivot_table(index='rodada', columns='time', values='pontos', aggfunc='sum')
+    pt_pontuacao_cum = pt_pontuacao.cumsum()
+
+    colunas = pt_pontuacao_cum.columns
+    df_regressao = pd.DataFrame()
+    data_regressao = []  # Lista para armazenar os dicionários de resultados de regressão
+
+    for coluna in colunas:
+        if coluna != 'rodada':
+            X = pt_pontuacao_cum['rodada'].values.reshape(-1, 1)
+            y = pt_pontuacao_cum[coluna].values.reshape(-1, 1)
+            regressor = LinearRegression()
+            regressor.fit(X, y)
+            A = regressor.intercept_[0]
+            B = regressor.coef_[0][0]
+            x = A + (B * 38)
+            new_row_regressao = {
+                'time': coluna,
+                'intercept': round(A, 2),
+                'slope': round(B, 2),
+                'pontuacao_final': round(x, 2)
+            }
+            data_regressao.append(new_row_regressao)
+
+    df_regressao = pd.DataFrame(data_regressao)
+    df_regressao.sort_values(by='pontuacao_final', ascending=False)

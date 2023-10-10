@@ -1,11 +1,12 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
+import json
 from streamlit_extras.metric_cards import style_metric_cards
 from streamlit_vertical_slider import vertical_slider
 from streamlit_card import card
 from sklearn.cluster import KMeans
-from dados import tabela_sort, tabela, df_cluster_grupo, getNomeTimeFromSigla, brasileirao, calcular_tabela, calcular_cluster
+from dados import tabela_sort, tabela, df_cluster_grupo, getNomeTimeFromSigla, brasileirao, calcular_tabela, calcular_cluster, calcular_regressao
 
 # Método para retornar a tabela de Classificação.
 def getDadoTabelaClassificacao(bAddClomunCluster = False):
@@ -31,7 +32,7 @@ def getClassificaoGrupo():
 # Método para criar o painel de dados do campeonato
 def createPainelCampeonato():
     st.subheader("Dados do campeonato")
-    card_total_jogo, card_total_gols, card_media_gol, card_total_ponto = st.columns(4)
+    card_total_jogo, card_total_gols, card_total_ponto, card_media_gol = st.columns(4)
     card_primeiro_colocado, card_time_mais_gol = st.columns(2)
     total_gol = int(brasileirao['Score_m'].sum() + brasileirao['Score_v'].sum())
     total_ponto = tabela_sort['P'].sum()
@@ -41,10 +42,10 @@ def createPainelCampeonato():
     total_rodada_jogada = brasileirao[brasileirao['Score_m'].notnull()]['Rodada'].unique().max()
     media_gol_rodada = total_gol / total_rodada_jogada
 
-    card_total_jogo.metric('Total de jogos', brasileirao[brasileirao['Score_m'].notnull()]['Rodada'].count())
+    card_total_jogo.metric(' de jTotalogos', brasileirao[brasileirao['Score_m'].notnull()]['Rodada'].count())
     card_total_gols.metric('Total de gols', total_gol)
-    card_media_gol.metric('Média de gol por rodada', round(media_gol_rodada))
     card_total_ponto.metric('Total de pontos', total_ponto)
+    card_media_gol.metric('Média de gol por rodada', round(media_gol_rodada))
     card_primeiro_colocado.metric('Primeiro colocado', nome_primeiro_colocado)
     card_time_mais_gol.metric('Time com mais gols', time_mais_gol)
     style_metric_cards(
@@ -59,7 +60,21 @@ def createPainelCampeonato():
 # Método utilizado para criar a tabela de Classificação
 def createTabelaClassificacao():
     st.subheader('Classificação Brasileirão 2023 - Série A 📜')
-    st.table(getDadoTabelaClassificacao())
+    vit_max = int(getDadoTabelaClassificacao()['V'].max())
+    st.dataframe(
+        getDadoTabelaClassificacao(), 
+        height=750, 
+        hide_index=True,
+        use_container_width=True,
+        column_config={
+            "V": st.column_config.ProgressColumn(
+                "V",
+                format="%f",
+                min_value=0,
+                max_value=vit_max
+            )
+        }
+    )
 
 # Método utilizado para criar a tabela de Classificação com Grupo
 def createTableClassificacaoGrupo():
@@ -145,6 +160,10 @@ def createTableCluster() :
                 domain=False
             )
         )
+
+def createTabelaRegressao():
+    st.table('Regressão', calcular_regressao())
+
     
 # Método utilizado para criar o Dashboard do campeonato
 def createDashboardCampeonato():
@@ -152,3 +171,4 @@ def createDashboardCampeonato():
     createTabelaClassificacao()
     createTableClassificacaoGrupo()
     createTableCluster()
+    createTabelaRegressao()
