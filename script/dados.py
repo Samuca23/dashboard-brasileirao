@@ -201,6 +201,9 @@ df_pred = df_pred.copy()
 
 ##########################################################
 
+def df_chance_cluster():
+   return df_pred
+
 def calcular_tabela(df):
   times = df['Mandante'].unique()
   tabela = []
@@ -232,6 +235,7 @@ def calcular_tabela(df):
   tabela = pd.DataFrame(tabela, columns = ['Time', 'Jogos', 'Vit', 'Emp', 'Der', 'GPro', 'GCon'])
   tabela['Pontos'] = (tabela['Vit'] * 3) + tabela['Emp']
   tabela['Saldo'] = tabela['GPro'] - tabela['GCon']
+  
   return tabela
 
 def calcular_cluster(df):
@@ -242,6 +246,7 @@ def calcular_cluster(df):
   cl['Ranking'] = cl['Media'].rank()
   cl = cl.rename(columns = {'index': 'Cluster'})
   df = df.merge(cl, on='Cluster', how='left')
+
   return df
 
 

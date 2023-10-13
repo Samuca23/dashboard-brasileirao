@@ -6,7 +6,7 @@ from streamlit_extras.metric_cards import style_metric_cards
 from streamlit_vertical_slider import vertical_slider
 from streamlit_card import card
 from sklearn.cluster import KMeans
-from dados import tabela_sort, tabela, df_cluster_grupo, getNomeTimeFromSigla, brasileirao, calcular_tabela, calcular_cluster, calcular_regressao, calcula_regressao_meio_campeonato
+from dados import tabela_sort, tabela, df_cluster_grupo, getNomeTimeFromSigla, brasileirao, calcular_tabela, calcular_cluster, calcular_regressao, calcula_regressao_meio_campeonato, df_chance_cluster
 
 # Método para retornar a tabela de Classificação.
 def getDadoTabelaClassificacao(bAddClomunCluster = False):
@@ -42,7 +42,7 @@ def createPainelCampeonato():
     total_rodada_jogada = brasileirao[brasileirao['Score_m'].notnull()]['Rodada'].unique().max()
     media_gol_rodada = total_gol / total_rodada_jogada
 
-    card_total_jogo.metric(' de jTotalogos', brasileirao[brasileirao['Score_m'].notnull()]['Rodada'].count())
+    card_total_jogo.metric('Total de jogos', brasileirao[brasileirao['Score_m'].notnull()]['Rodada'].count())
     card_total_gols.metric('Total de gols', total_gol)
     card_total_ponto.metric('Total de pontos', total_ponto)
     card_media_gol.metric('Média de gol por rodada', round(media_gol_rodada))
@@ -60,6 +60,7 @@ def createPainelCampeonato():
 # Método utilizado para criar a tabela de Classificação
 def createTabelaClassificacao():
     st.subheader('Classificação Brasileirão 2023 - Série A 📜')
+    progresso  = st.toggle('Progresso dos dados')
     dadoTabelaClassificacao = getDadoTabelaClassificacao()
 
     iClassificacao = 0
@@ -67,22 +68,73 @@ def createTabelaClassificacao():
         iClassificacao += 1
         dadoTabelaClassificacao.loc[dadoTabelaClassificacao['Time'] == i, 'Classificação'] = f"{iClassificacao}º"
         
-    vit_max = int(dadoTabelaClassificacao['V'].max())
     dadoTabelaClassificacao = dadoTabelaClassificacao[['Classificação', 'Time', 'P', 'J', 'V', 'E', 'D', 'GP', 'GC', 'SG']]
-    st.dataframe(
-        dadoTabelaClassificacao, 
-        height=750, 
-        hide_index=True,
-        use_container_width=True,
-        column_config={
-            "V": st.column_config.ProgressColumn(
-                "V",
-                format="%f",
-                min_value=0,
-                max_value=vit_max
-            )
-        }
-    )
+    
+    if progresso :
+        pon_max = int(dadoTabelaClassificacao['P'].max())
+        vit_max = int(dadoTabelaClassificacao['V'].max())
+        emp_max = int(dadoTabelaClassificacao['E'].max())
+        der_max = int(dadoTabelaClassificacao['D'].max())
+        gop_max = int(dadoTabelaClassificacao['GP'].max())
+        goc_max = int(dadoTabelaClassificacao['GC'].max())
+        sag_max = int(dadoTabelaClassificacao['SG'].max())
+        st.dataframe(
+            dadoTabelaClassificacao, 
+            height=750, 
+            hide_index=True,
+            use_container_width=True,
+            column_config={
+                "P": st.column_config.ProgressColumn(
+                    "P",
+                    format="%f",
+                    min_value=0,
+                    max_value=pon_max
+                ),
+                "V": st.column_config.ProgressColumn(
+                    "V",
+                    format="%f",
+                    min_value=0,
+                    max_value=vit_max
+                ),
+                "E": st.column_config.ProgressColumn(
+                    "E",
+                    format="%f",
+                    min_value=0,
+                    max_value=emp_max
+                ),
+                "D": st.column_config.ProgressColumn(
+                    "D",
+                    format="%f",
+                    min_value=0,
+                    max_value=der_max
+                ),
+                "GP": st.column_config.ProgressColumn(
+                    "GP",
+                    format="%f",
+                    min_value=0,
+                    max_value=gop_max
+                ),
+                "GC": st.column_config.ProgressColumn(
+                    "GC",
+                    format="%f",
+                    min_value=0,
+                    max_value=goc_max
+                ),
+                "SG": st.column_config.ProgressColumn(
+                    "SG",
+                    format="%f",
+                    min_value=0,
+                    max_value=sag_max
+                )
+            }
+        )
+    else :
+        st.dataframe(
+            dadoTabelaClassificacao, 
+            height=750, 
+            hide_index=True,
+            use_container_width=True,
+        )
 
 # Método utilizado para criar a tabela de Classificação com Grupo
 def createTableClassificacaoGrupo():
@@ -174,6 +226,29 @@ def createTableCluster() :
                 domain=False
             )
         )
+
+def createTableChanceCluster():
+    df_chance_pred = df_chance_cluster().copy()
+    df_chance_pred.rename(columns={'cl_o': 'Libertadores', 'cl_1': 'Limbo', 'cl_2': 'Rebaixamento', 'cl_3': 'Título', 'cl_4': 'Sul-Americana'}, inplace=True)
+    df_chance_pred['Título'] = trataValorPorcentagemTime(df_chance_pred['Título'])
+    df_chance_pred['Libertadores'] = trataValorPorcentagemTime(df_chance_pred['Libertadores'])
+    df_chance_pred['Sul-Americana'] = trataValorPorcentagemTime(df_chance_pred['Sul-Americana'])
+    df_chance_pred['Limbo'] = trataValorPorcentagemTime(df_chance_pred['Limbo'])
+    df_chance_pred['Rebaixamento'] = trataValorPorcentagemTime(df_chance_pred['Rebaixamento'])
+    df_chance_pred = df_chance_pred[['Time', 'Título', 'Libertadores', 'Sul-Americana', 'Limbo', 'Rebaixamento']]
+    st.dataframe(
+        df_chance_pred.sort_values(by='Título', ascending=False),
+        hide_index=True,
+        height=750,
+        use_container_width=True,
+        column_config= {
+            'Título' : st.column_config.Column('Título %'),
+            'Libertadores' : st.column_config.Column('Libertadores %'),
+            'Sul-Americana' : st.column_config.Column('Sul-Americana %'),
+            'Limbo' : st.column_config.Column('Limbo %'),
+            'Rebaixamento' : st.column_config.Column('Rebaixamento %')
+        }
+        )
   
 def createTabelaRegressao():
     dadoTabelaClassificacao = calcular_regressao()
@@ -218,10 +293,16 @@ def createTabelaRegressaoMeioCampeonato():
         })
 
 def createAreaRegressao(): 
-    st.subheader('Tabela de pontos finais - Regressão')
+    st.header('Regressão')
+    st.subheader('Tabela de pontos finais')
     createTabelaRegressao()
-    st.subheader('Tabela de pontos finais com dados da rodade 19 em diante - Regressão')
+    st.subheader('Tabela de pontos finais com dados da rodade 19 em diante')
     createTabelaRegressaoMeioCampeonato()
+
+def trataValorPorcentagemTime(valor):
+    retorno = valor * 100
+
+    return round(retorno)
     
 # Método utilizado para criar o Dashboard do campeonato
 def createDashboardCampeonato():
@@ -229,4 +310,6 @@ def createDashboardCampeonato():
     createTabelaClassificacao()
     createTableClassificacaoGrupo()
     createTableCluster()
+    createTableChanceCluster()
     createAreaRegressao()
+    
