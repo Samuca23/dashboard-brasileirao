@@ -1,6 +1,6 @@
 import streamlit as st
 from streamlit_extras.metric_cards import style_metric_cards
-from dados import tabela, tabela_sort, df_chance_cluster, df_cluster_grupo, getAllTimes, getSiglaTimeFromNome, getNomeTimeFromSigla
+from dados import tabela, tabela_sort, df_chance_cluster, df_cluster_grupo, getAllTimes, getSiglaTimeFromNome, getNomeTimeFromSigla, calcular_regressao
 
 def createSelecboxTime():
     times = getAllTimes()
@@ -17,17 +17,33 @@ def createSelecboxTime():
 def createDashboardTime(sigla):
     montaPainelTime(sigla)
 
+def getDadoTabelaClassificacao(bAddClomunCluster = False):
+    iClassificacao = 0
+    for i in tabela_sort['Time']:
+        iClassificacao += 1
+        tabela_sort.loc[tabela_sort['Time'] == i, 'Classificação'] = f"{iClassificacao}º"
+        
+    classificacao = tabela_sort[['Classificação', 'Time', 'P', 'J', 'V', 'E', 'D', 'GP', 'GC', 'SG']]
+    classificacao['GP'] = classificacao['GP'].astype(int)
+    classificacao['GC'] = classificacao['GC'].astype(int)
+    classificacao['SG'] = classificacao['SG'].astype(int)
+    if bAddClomunCluster:
+        classificacao['Cluster'] = tabela_sort[['cluster']]
+
+    return classificacao
+
 # Método para montar o painel de métricar de status do time no campeonáto
 def montaPainelTime(sigla): 
     df_chance_pred = df_chance_cluster().copy()
-    index_of_sigla = df_chance_pred.index[df_chance_pred['Time'] == sigla].tolist()[0]
-    nome_time = getNomeTimeFromSigla(df_chance_pred.loc[index_of_sigla, 'Time'])
+    index_of_sigla_pred = df_chance_pred.index[df_chance_pred['Time'] == sigla].tolist()[0]
+    nome_time = getNomeTimeFromSigla(df_chance_pred.loc[index_of_sigla_pred, 'Time'])
 
     st.subheader(f"{nome_time}")
 
-    createPainelInfoTime()
-    createPainelStatusCampeonato(index_of_sigla, df_chance_pred)
-    createPainelRegressaoTime()
+    createPainelInfoTime(sigla)
+    createPainelStatusCampeonato()
+    createPainelChancesCampeonato(index_of_sigla_pred, df_chance_pred)
+    createPainelRegressaoTime(sigla)
 
     style_metric_cards(
         border_left_color="#4fb342",
@@ -38,21 +54,34 @@ def montaPainelTime(sigla):
         box_shadow=True
     )
 
-def createPainelInfoTime():
+def createPainelInfoTime(sigla):
+    tabela = getDadoTabelaClassificacao()
+    index_of_sigla = tabela.index[tabela['Time'] == sigla].tolist()[0]
     st.subheader('Status da classificação.')
     card_classificacao, card_ponto, card_jogo, card_vitoria, card_empate, card_derrota, = st.columns(6)
     card_gol_pro, card_gol_con, card_saldo_gol = st.columns(3)
-    card_classificacao.metric('Classificação', f"{1}º")
-    card_ponto.metric('Pontos', 10)
-    card_jogo.metric('Jogos', 10)
-    card_vitoria.metric('Vitórias', 10)
-    card_empate.metric('Empates', 10)
-    card_derrota.metric('Derrotas', 10)
-    card_gol_pro.metric('Gols Pró', 10)
-    card_gol_con.metric('Gols Contra', 10)
-    card_saldo_gol.metric('Saldo de Gols', 10)
+    card_classificacao.metric('Classificação', f"{tabela.loc[index_of_sigla, 'Classificação']}")
+    card_ponto.metric('Pontos', tabela.loc[index_of_sigla, 'P'])
+    card_jogo.metric('Jogos', tabela.loc[index_of_sigla, 'J'])
+    card_vitoria.metric('Vitórias', tabela.loc[index_of_sigla, 'V'])
+    card_empate.metric('Empates', tabela.loc[index_of_sigla, 'E'])
+    card_derrota.metric('Derrotas', tabela.loc[index_of_sigla, 'D'])
+    card_gol_pro.metric('Gols Pró', tabela.loc[index_of_sigla, 'GP'])
+    card_gol_con.metric('Gols Contra', tabela.loc[index_of_sigla, 'GC'])
+    card_saldo_gol.metric('Saldo de Gols', tabela.loc[index_of_sigla, 'SG'])
 
-def createPainelStatusCampeonato(index_of_sigla, df_chance_pred):
+def createPainelStatusCampeonato():
+    st.subheader('Status no campeonato.')
+    st.text('Vitórias')
+    card_vitorias_mandante, card_vitoria_visitante = st.columns(2)
+    card_vitorias_mandante.metric('Mandante', 10)
+    card_vitoria_visitante.metric('Visitante', 10)
+    st.text('Derrotas')
+    card_derrota_mandante, card_derrota_visitante = st.columns(2)
+    card_derrota_mandante.metric('Mandante', 10)
+    card_derrota_visitante.metric('Visitante', 10)
+
+def createPainelChancesCampeonato(index_of_sigla, df_chance_pred):
     st.subheader('Chances dentro do campeonato.')
     libertadores = trataValorDashboardTime(df_chance_pred.loc[index_of_sigla, 'cl_o'])
     limbo = trataValorDashboardTime(df_chance_pred.loc[index_of_sigla, 'cl_1'])
@@ -67,12 +96,27 @@ def createPainelStatusCampeonato(index_of_sigla, df_chance_pred):
     card_limbo.metric('Limbo', f"{limbo}%")
     card_rebaixamento.metric('Rebaixamento', f"{rebaixamento}%")
 
-def createPainelRegressaoTime():
+def createPainelRegressaoTime(sigla):
+    dadoTabelaClassificacao = calcular_regressao()
+    tabela = getDadoTabelaClassificacao(True)
+    # index_of_sigla_tabela =  tabela.index[tabela['Time'] == sigla].tolist()[0]
+    # iGrupo = tabela.loc[index_of_sigla_tabela, 'Cluster']
+    # linha_grupo = df_cluster_grupo.loc[df_cluster_grupo['cluster'] == 2]
+    # sGrupo = linha_grupo['grupo'].values[0]
+    index_of_sigla = dadoTabelaClassificacao.index[dadoTabelaClassificacao['time'] == sigla].tolist()[0]
+
+    iClassificacao = 0
+    for i in dadoTabelaClassificacao['time']:
+        iClassificacao += 1
+        dadoTabelaClassificacao.loc[dadoTabelaClassificacao['time'] == i, 'Classificação'] = f"{iClassificacao}"
+
+    dadoTabelaClassificacao = dadoTabelaClassificacao[['Classificação', 'time', 'pontuacao_final', 'intercept', 'slope']]
+
     st.subheader('Previsão final do time no campeonato')
     card_classificacao, card_ponto, card_grupo = st.columns(3)
-    card_classificacao.metric('Classificação', f"{3}º")
-    card_ponto.metric('Pontos', 99)
-    card_grupo.metric('Grupo', 'Libertadores')
+    card_classificacao.metric('Classificação', f"{dadoTabelaClassificacao.loc[index_of_sigla, 'Classificação']}º")
+    card_ponto.metric('Pontos', dadoTabelaClassificacao.loc[index_of_sigla, 'pontuacao_final'])
+    card_grupo.metric('Grupo', 'Arrumar')
 
 # Método para realizar o tratamento dos valores do dashboard de status do time no campeonato
 def trataValorDashboardTime(valor):

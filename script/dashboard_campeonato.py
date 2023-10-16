@@ -1,12 +1,8 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
-import json
 from streamlit_extras.metric_cards import style_metric_cards
-from streamlit_vertical_slider import vertical_slider
-from streamlit_card import card
-from sklearn.cluster import KMeans
-from dados import tabela_sort, tabela, df_cluster_grupo, getNomeTimeFromSigla, brasileirao, calcular_tabela, calcular_cluster, calcular_regressao, calcula_regressao_meio_campeonato, df_chance_cluster
+from dados import tabela_sort, df_cluster_grupo, getNomeTimeFromSigla, brasileirao, calcular_tabela, calcular_cluster, calcular_regressao, calcula_regressao_meio_campeonato, df_chance_cluster
 
 # Método para retornar a tabela de Classificação.
 def getDadoTabelaClassificacao(bAddClomunCluster = False):
