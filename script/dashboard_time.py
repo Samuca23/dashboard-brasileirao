@@ -23,9 +23,12 @@ def montaPainelTime(sigla):
     index_of_sigla = df_chance_pred.index[df_chance_pred['Time'] == sigla].tolist()[0]
     nome_time = getNomeTimeFromSigla(df_chance_pred.loc[index_of_sigla, 'Time'])
 
-    st.subheader(f"{nome_time} no Campeonato Brasileiro de Futebol")
+    st.subheader(f"{nome_time}")
+
     createPainelInfoTime()
     createPainelStatusCampeonato(index_of_sigla, df_chance_pred)
+    createPainelRegressaoTime()
+
     style_metric_cards(
         border_left_color="#4fb342",
         background_color="#F0F2F6",
@@ -36,10 +39,10 @@ def montaPainelTime(sigla):
     )
 
 def createPainelInfoTime():
-    st.subheader('Status da classificação')
+    st.subheader('Status da classificação.')
     card_classificacao, card_ponto, card_jogo, card_vitoria, card_empate, card_derrota, = st.columns(6)
     card_gol_pro, card_gol_con, card_saldo_gol = st.columns(3)
-    card_classificacao.metric('Classificação', 1)
+    card_classificacao.metric('Classificação', f"{1}º")
     card_ponto.metric('Pontos', 10)
     card_jogo.metric('Jogos', 10)
     card_vitoria.metric('Vitórias', 10)
@@ -50,7 +53,7 @@ def createPainelInfoTime():
     card_saldo_gol.metric('Saldo de Gols', 10)
 
 def createPainelStatusCampeonato(index_of_sigla, df_chance_pred):
-    st.subheader('Chances dentro do campeonato')
+    st.subheader('Chances dentro do campeonato.')
     libertadores = trataValorDashboardTime(df_chance_pred.loc[index_of_sigla, 'cl_o'])
     limbo = trataValorDashboardTime(df_chance_pred.loc[index_of_sigla, 'cl_1'])
     rebaixamento = trataValorDashboardTime(df_chance_pred.loc[index_of_sigla, 'cl_2'])
@@ -63,6 +66,13 @@ def createPainelStatusCampeonato(index_of_sigla, df_chance_pred):
     card_sul_americada.metric('Sul-Americana', f"{sulAmericana}%")
     card_limbo.metric('Limbo', f"{limbo}%")
     card_rebaixamento.metric('Rebaixamento', f"{rebaixamento}%")
+
+def createPainelRegressaoTime():
+    st.subheader('Previsão final do time no campeonato')
+    card_classificacao, card_ponto, card_grupo = st.columns(3)
+    card_classificacao.metric('Classificação', f"{3}º")
+    card_ponto.metric('Pontos', 99)
+    card_grupo.metric('Grupo', 'Libertadores')
 
 # Método para realizar o tratamento dos valores do dashboard de status do time no campeonato
 def trataValorDashboardTime(valor):

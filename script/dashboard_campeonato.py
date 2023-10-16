@@ -31,7 +31,7 @@ def getClassificaoGrupo():
 
 # Método para criar o painel de dados do campeonato
 def createPainelCampeonato():
-    st.subheader("Dados do campeonato")
+    st.subheader("Dados do campeonato.")
     card_total_jogo, card_total_gols, card_total_ponto, card_media_gol = st.columns(4)
     card_primeiro_colocado, card_time_mais_gol = st.columns(2)
     total_gol = int(brasileirao['Score_m'].sum() + brasileirao['Score_v'].sum())
@@ -59,7 +59,7 @@ def createPainelCampeonato():
 
 # Método utilizado para criar a tabela de Classificação
 def createTabelaClassificacao():
-    st.subheader('Classificação Brasileirão 2023 - Série A 📜')
+    st.subheader('Classificação Brasileirão 2023.')
     progresso  = st.toggle('Progresso dos dados')
     dadoTabelaClassificacao = getDadoTabelaClassificacao()
 
@@ -138,7 +138,7 @@ def createTabelaClassificacao():
 
 # Método utilizado para criar a tabela de Classificação com Grupo
 def createTableClassificacaoGrupo():
-    st.subheader('Classificação Brasileirão 2023 por Grupo - Série A 📜')
+    st.subheader('Classificação Brasileirão 2023 por Grupo.')
     opcao = st.selectbox(
         'Escolha o Grupo',
         (df_cluster_grupo['grupo']))
@@ -147,7 +147,7 @@ def createTableClassificacaoGrupo():
 
 # Método para criar os gráficos de desempenho dos time durante o campeonato
 def createTableCluster() :
-    st.subheader('Gráficos de desempenho dos times durante o campeonato')
+    st.subheader('Gráficos de desempenho dos times durante o campeonato.')
     rodada_inicial = st.slider('Rodada', min_value = 2, max_value = 38)
     clusters = []
     for rodada in range(rodada_inicial, brasileirao[brasileirao['Score_m'].notnull()]['Rodada'].max() + 1):
@@ -228,6 +228,7 @@ def createTableCluster() :
         )
 
 def createTableChanceCluster():
+    st.subheader('Chances dentro do Campeonato.')
     df_chance_pred = df_chance_cluster().copy()
     df_chance_pred.rename(columns={'cl_o': 'Libertadores', 'cl_1': 'Limbo', 'cl_2': 'Rebaixamento', 'cl_3': 'Título', 'cl_4': 'Sul-Americana'}, inplace=True)
     df_chance_pred['Título'] = trataValorPorcentagemTime(df_chance_pred['Título'])
@@ -294,9 +295,9 @@ def createTabelaRegressaoMeioCampeonato():
 
 def createAreaRegressao(): 
     st.header('Regressão')
-    st.subheader('Tabela de pontos finais')
+    st.subheader('Tabela de pontos finais.')
     createTabelaRegressao()
-    st.subheader('Tabela de pontos finais com dados da rodade 19 em diante')
+    st.subheader('Tabela de pontos finais com dados da metade (rodada 19) em diante.')
     createTabelaRegressaoMeioCampeonato()
 
 def trataValorPorcentagemTime(valor):
