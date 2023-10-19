@@ -203,9 +203,9 @@ def createTableCluster():
         .encode(
             x="Rodada:O",
             y=alt.Y("Time:O", sort=colocacao),
-            size="sum(Grupo):O",
+            size=alt.Size("Grupo:O", scale=alt.Scale(domain=domain)),
             color=alt.Color(
-                "Grupo:N", scale=alt.Scale(domain=domain, range=range_color)
+                "Grupo:O", scale=alt.Scale(domain=domain, range=range_color)
             ),
             tooltip=[
                 alt.Tooltip("Time", title="Time"),
