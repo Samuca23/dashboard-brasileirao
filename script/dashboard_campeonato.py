@@ -154,7 +154,7 @@ def createTableClassificacaoGrupo():
 # Método para criar os gráficos de desempenho dos time durante o campeonato
 def createTableCluster():
     st.subheader("Gráficos de desempenho dos times durante o campeonato.")
-    rodada_inicial = st.slider("Rodada", min_value=2, max_value=38)
+    rodada_inicial = st.slider("Rodada", min_value=2, max_value=38, value=10)
     clusters = []
     for rodada in range(
         rodada_inicial,
@@ -164,6 +164,19 @@ def createTableCluster():
         bra_rodada = bra_rodada[bra_rodada["Score_m"].notnull()]
         tabela_rodada = calcular_tabela(bra_rodada)
         tabela_rodada_cluster = calcular_cluster(tabela_rodada)
+
+        for index, row in tabela_rodada_cluster.iterrows():
+            if row["Ranking"] == 1:
+                tabela_rodada_cluster.loc[index, "Ranking"] = "Rebaixamento"
+            elif row["Ranking"] == 2:
+                tabela_rodada_cluster.loc[index, "Ranking"] = "Limbo"
+            elif row["Ranking"] == 3:
+                tabela_rodada_cluster.loc[index, "Ranking"] = "Sul-Americana"
+            elif row["Ranking"] == 4:
+                tabela_rodada_cluster.loc[index, "Ranking"] = "Libertadores"
+            elif row["Ranking"] == 5:
+                tabela_rodada_cluster.loc[index, "Ranking"] = "Título"
+
         for index, row in tabela_rodada_cluster.iterrows():
             clusters.insert(
                 len(clusters),
@@ -177,7 +190,8 @@ def createTableCluster():
         by=["Pontos", "Vit", "Saldo"], ascending=False
     )
     colocacao = list(tabela_atual["Time"])
-    domain = [1, 2, 3, 4, 5]
+    # domain = [1, 2, 3, 4, 5]
+    domain = ["Rebaixamento", "Limbo", "Sul-Americana", "Libertadores", "Título"]
     range_color = ["red", "orange", "yellow", "green", "blue"]
     opaco = ["black", "gray", "lightgray", "turquoise", "steelblue"]
 
@@ -191,7 +205,7 @@ def createTableCluster():
             y=alt.Y("Time:O", sort=colocacao),
             size="sum(Grupo):O",
             color=alt.Color(
-                "Grupo:O", scale=alt.Scale(domain=domain, range=range_color)
+                "Grupo:N", scale=alt.Scale(domain=domain, range=range_color)
             ),
             tooltip=[
                 alt.Tooltip("Time", title="Time"),
