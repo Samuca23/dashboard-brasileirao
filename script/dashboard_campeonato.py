@@ -129,7 +129,7 @@ def createTabelaClassificacao():
             dadoTabelaClassificacao, 
             height=750, 
             hide_index=True,
-            use_container_width=True,
+            use_container_width=True
         )
 
 # Método utilizado para criar a tabela de Classificação com Grupo
@@ -139,7 +139,10 @@ def createTableClassificacaoGrupo():
         'Escolha o Grupo',
         (df_cluster_grupo['grupo']))
     classificacaoGrupo = getClassificaoGrupo()
-    st.table(classificacaoGrupo[classificacaoGrupo['Grupo'] == opcao])
+    st.dataframe(
+        classificacaoGrupo[classificacaoGrupo['Grupo'] == opcao],
+        hide_index=True,
+        use_container_width=True)
 
 # Método para criar os gráficos de desempenho dos time durante o campeonato
 def createTableCluster() :
@@ -290,7 +293,6 @@ def createTabelaRegressaoMeioCampeonato():
         })
 
 def createAreaRegressao(): 
-    st.header('Regressão')
     st.subheader('Tabela de pontos finais.')
     createTabelaRegressao()
     st.subheader('Tabela de pontos finais com dados da metade (rodada 19) em diante.')
@@ -303,10 +305,20 @@ def trataValorPorcentagemTime(valor):
     
 # Método utilizado para criar o Dashboard do campeonato
 def createDashboardCampeonato():
-    createPainelCampeonato()
-    createTabelaClassificacao()
-    createTableClassificacaoGrupo()
-    createTableCluster()
-    createTableChanceCluster()
-    createAreaRegressao()
+    st.header('Campeonato Brasileiro 2023.')
+    painel_campeonato, classificao_grupo, classificacao_regressao, chances_campeonato = st.tabs(['Campeonato e Classificação', 
+                                                                                               'Classificação - Grupo', 
+                                                                                               'Classificação - Previsão',
+                                                                                               'Chances dentro do Campeonato'])
+
+    with painel_campeonato:
+        createPainelCampeonato()
+        createTabelaClassificacao()
+    with classificao_grupo:
+        createTableClassificacaoGrupo()
+        createTableCluster()
+    with classificacao_regressao:
+        createAreaRegressao()
+    with chances_campeonato:
+        createTableChanceCluster()
     

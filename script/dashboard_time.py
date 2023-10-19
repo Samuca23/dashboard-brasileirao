@@ -4,11 +4,11 @@ from dados import tabela, tabela_sort, df_chance_cluster, df_cluster_grupo, getA
 
 def createSelecboxTime():
     times = getAllTimes()
-    
+    st.header('Estatísticas do Time.')
     opcao_padrao = "Selecione um time..."
     times_lista = [opcao_padrao] + times["Time"].tolist()
     
-    selected = st.selectbox("Escolha um time", times_lista)
+    selected = st.selectbox("Escolha um time:", times_lista)
 
     if selected != opcao_padrao:
         createDashboardTime(getSiglaTimeFromNome(selected))
@@ -39,11 +39,19 @@ def montaPainelTime(sigla):
     nome_time = getNomeTimeFromSigla(df_chance_pred.loc[index_of_sigla_pred, 'Time'])
 
     st.subheader(f"{nome_time}")
+    painel_dado_campeonato, painel_status_campeonato, painel_chance_campeonato, painel_previsao_final = st.tabs(['Dados da Classificação', 
+                                                                                                                 'Status Campeonado',
+                                                                                                                 'Chances no Campeonato',
+                                                                                                                 'Previsão final'])
 
-    createPainelInfoTime(sigla)
-    createPainelStatusCampeonato()
-    createPainelChancesCampeonato(index_of_sigla_pred, df_chance_pred)
-    createPainelRegressaoTime(sigla)
+    with painel_dado_campeonato:
+        createPainelInfoTime(sigla)
+    with painel_status_campeonato:
+        createPainelStatusCampeonato()
+    with painel_chance_campeonato:
+        createPainelChancesCampeonato(index_of_sigla_pred, df_chance_pred)
+    with painel_previsao_final:
+        createPainelRegressaoTime(sigla)
 
     style_metric_cards(
         border_left_color="#4fb342",
@@ -98,7 +106,7 @@ def createPainelChancesCampeonato(index_of_sigla, df_chance_pred):
 
 def createPainelRegressaoTime(sigla):
     dadoTabelaClassificacao = calcular_regressao()
-    tabela = getDadoTabelaClassificacao(True)
+    # tabela = getDadoTabelaClassificacao(True)
     # index_of_sigla_tabela =  tabela.index[tabela['Time'] == sigla].tolist()[0]
     # iGrupo = tabela.loc[index_of_sigla_tabela, 'Cluster']
     # linha_grupo = df_cluster_grupo.loc[df_cluster_grupo['cluster'] == 2]
