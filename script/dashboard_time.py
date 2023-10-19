@@ -3,11 +3,13 @@ from streamlit_extras.metric_cards import style_metric_cards
 from dados import (
     brasileirao,
     tabela_sort,
+    df_cluster_grupo,
     df_chance_cluster,
     getAllTimes,
     getSiglaTimeFromNome,
     getNomeTimeFromSigla,
     calcular_regressao,
+    calcula_regressao_cluster
 )
 
 
@@ -187,11 +189,6 @@ def createPainelChancesCampeonato(index_of_sigla, df_chance_pred):
 
 def createPainelRegressaoTime(sigla):
     dadoTabelaClassificacao = calcular_regressao()
-    # tabela = getDadoTabelaClassificacao(True)
-    # index_of_sigla_tabela =  tabela.index[tabela['Time'] == sigla].tolist()[0]
-    # iGrupo = tabela.loc[index_of_sigla_tabela, 'Cluster']
-    # linha_grupo = df_cluster_grupo.loc[df_cluster_grupo['cluster'] == 2]
-    # sGrupo = linha_grupo['grupo'].values[0]
     index_of_sigla = dadoTabelaClassificacao.index[
         dadoTabelaClassificacao["time"] == sigla
     ].tolist()[0]
@@ -216,7 +213,12 @@ def createPainelRegressaoTime(sigla):
     card_ponto.metric(
         "Pontos", dadoTabelaClassificacao.loc[index_of_sigla, "pontuacao_final"]
     )
-    card_grupo.metric("Grupo", "Arrumar")
+    tabela_regressao_cluster = calcula_regressao_cluster()
+    index_of_sigla = tabela_regressao_cluster.index[tabela_regressao_cluster['Time'] == sigla].tolist()[0]
+    iGrupo = tabela_regressao_cluster.loc[index_of_sigla, 'cluster_pred']
+    linha_grupo = df_cluster_grupo.loc[df_cluster_grupo['cluster'] == iGrupo]
+    sGrupo = linha_grupo['grupo'].values[0]
+    card_grupo.metric("Grupo", sGrupo)
 
 
 # Método para realizar o tratamento dos valores do dashboard de status do time no campeonato

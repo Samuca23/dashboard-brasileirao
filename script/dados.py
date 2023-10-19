@@ -186,7 +186,6 @@ df_pred = df_pred.copy()
 
 ##########################################################
 
-
 def df_chance_cluster():
     return df_pred
 
@@ -423,3 +422,26 @@ def calcula_regressao_meio_campeonato():
     df_regressao = pd.DataFrame(regressao_data)
 
     return df_regressao.sort_values(by="pontuacao_final", ascending=False)
+
+def calcula_regressao_cluster():
+    df_regressao = calcular_regressao()
+    tabela_teste = tabela.merge(df_regressao, left_on='Time', right_on='time', how='left')
+    df_data = tabela_teste[[
+        'P',              
+        'V',
+        'E',
+        'D',
+        'SG',
+        'slope'
+    ]]
+    kmeans = KMeans(n_clusters=5, random_state=0).fit(df_data)
+    tabela_teste['cluster'] = kmeans.labels_
+    tabela_teste['c_p'] = kmeans.cluster_centers_[kmeans.labels_,0]
+    tabela_teste['c_v'] = kmeans.cluster_centers_[kmeans.labels_,1]
+    tabela_teste['c_e'] = kmeans.cluster_centers_[kmeans.labels_,2]
+    tabela_teste['c_d'] = kmeans.cluster_centers_[kmeans.labels_,3]
+    tabela_teste['c_sg'] = kmeans.cluster_centers_[kmeans.labels_,4]
+    tabela_teste['c_slope'] = kmeans.cluster_centers_[kmeans.labels_,5]
+    tabela_sort = tabela_teste.sort_values(by=['P','V','SG'], ascending=False)
+
+    return tabela_sort
