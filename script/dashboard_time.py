@@ -9,7 +9,7 @@ from dados import (
     getSiglaTimeFromNome,
     getNomeTimeFromSigla,
     calcular_regressao,
-    calcula_regressao_cluster
+    calcula_regressao_cluster,
 )
 
 
@@ -214,10 +214,12 @@ def createPainelRegressaoTime(sigla):
         "Pontos", dadoTabelaClassificacao.loc[index_of_sigla, "pontuacao_final"]
     )
     tabela_regressao_cluster = calcula_regressao_cluster()
-    index_of_sigla = tabela_regressao_cluster.index[tabela_regressao_cluster['Time'] == sigla].tolist()[0]
-    iGrupo = tabela_regressao_cluster.loc[index_of_sigla, 'cluster_pred']
-    linha_grupo = df_cluster_grupo.loc[df_cluster_grupo['cluster'] == iGrupo]
-    sGrupo = linha_grupo['grupo'].values[0]
+    index_of_sigla = tabela_regressao_cluster.index[
+        tabela_regressao_cluster["Time"] == sigla
+    ].tolist()[0]
+    iGrupo = tabela_regressao_cluster.loc[index_of_sigla, "cluster_pred"]
+    linha_grupo = df_cluster_grupo.loc[df_cluster_grupo["cluster"] == iGrupo]
+    sGrupo = linha_grupo["grupo"].values[0]
     card_grupo.metric("Grupo", sGrupo)
 
 

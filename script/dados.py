@@ -129,49 +129,6 @@ df_prob = df_prob.rename(
 
 tabela = pd.merge(tabela, df_prob, left_index=True, right_index=True)
 
-################################################
-df_data = tabela[["cluster", "P", "V", "E", "D", "SG"]]
-
-X_Train = df_data.drop(columns=["cluster"], axis=1)
-X_Test = df_data.drop(columns=["cluster"], axis=1)
-y_Train = df_data["cluster"]
-y_Test = df_data["cluster"]
-
-sc_x = StandardScaler()
-X_Train = sc_x.fit_transform(X_Train)
-X_Test = sc_x.fit_transform(X_Test)
-
-logreg = LogisticRegression(solver="lbfgs", max_iter=500)
-logreg.fit(X_Train, y_Train)
-pred_logreg = logreg.predict(X_Test)
-pred_proba = logreg.predict_proba(X_Test)
-
-tabela["cluster_pred"] = pred_logreg
-
-lista_proba = pred_proba.tolist()
-
-data = []  # Lista para armazenar os dicionários de dados
-
-index = 0
-for proba in lista_proba:
-    for i in range(0, len(proba)):
-        new_row = {"index": index, "prob": i, "valor": round(proba[i], 4)}
-        data.append(new_row)
-    index += 1
-
-df_prob = pd.DataFrame(data)  # Cria o DataFrame a partir da lista de dicionários
-df_prob = df_prob.pivot_table(
-    index="index", columns="prob", values="valor", aggfunc="sum"
-)
-df_prob = df_prob.reset_index()
-df_prob = df_prob.set_index("index")
-
-df_prob = df_prob.rename(
-    columns={0.0: "cl_o", 1.0: "cl_1", 2.0: "cl_2", 3.0: "cl_3", 4.0: "cl_4"}
-)
-
-tabela_clutabelaster_pred = pd.merge(tabela, df_prob, left_index=True, right_index=True)
-
 df_pred = tabela[
     [
         "Time",
@@ -184,7 +141,6 @@ df_pred = tabela[
 ]
 df_pred = df_pred.copy()
 
-##########################################################
 
 def df_chance_cluster():
     return df_pred
@@ -415,7 +371,7 @@ def calcula_regressao_meio_campeonato():
                     "time": coluna,
                     "intercept": round(A, 2),
                     "slope": round(B, 2),
-                    "pontuacao_final": round(x, 2),
+                    "pontuacao_final": round(x),
                 }
             )
 
@@ -423,25 +379,21 @@ def calcula_regressao_meio_campeonato():
 
     return df_regressao.sort_values(by="pontuacao_final", ascending=False)
 
+
 def calcula_regressao_cluster():
     df_regressao = calcular_regressao()
-    tabela_teste = tabela.merge(df_regressao, left_on='Time', right_on='time', how='left')
-    df_data = tabela_teste[[
-        'P',              
-        'V',
-        'E',
-        'D',
-        'SG',
-        'slope'
-    ]]
+    tabela_teste = tabela.merge(
+        df_regressao, left_on="Time", right_on="time", how="left"
+    )
+    df_data = tabela_teste[["P", "V", "E", "D", "SG", "slope"]]
     kmeans = KMeans(n_clusters=5, random_state=0).fit(df_data)
-    tabela_teste['cluster'] = kmeans.labels_
-    tabela_teste['c_p'] = kmeans.cluster_centers_[kmeans.labels_,0]
-    tabela_teste['c_v'] = kmeans.cluster_centers_[kmeans.labels_,1]
-    tabela_teste['c_e'] = kmeans.cluster_centers_[kmeans.labels_,2]
-    tabela_teste['c_d'] = kmeans.cluster_centers_[kmeans.labels_,3]
-    tabela_teste['c_sg'] = kmeans.cluster_centers_[kmeans.labels_,4]
-    tabela_teste['c_slope'] = kmeans.cluster_centers_[kmeans.labels_,5]
-    tabela_sort = tabela_teste.sort_values(by=['P','V','SG'], ascending=False)
+    tabela_teste["cluster"] = kmeans.labels_
+    tabela_teste["c_p"] = kmeans.cluster_centers_[kmeans.labels_, 0]
+    tabela_teste["c_v"] = kmeans.cluster_centers_[kmeans.labels_, 1]
+    tabela_teste["c_e"] = kmeans.cluster_centers_[kmeans.labels_, 2]
+    tabela_teste["c_d"] = kmeans.cluster_centers_[kmeans.labels_, 3]
+    tabela_teste["c_sg"] = kmeans.cluster_centers_[kmeans.labels_, 4]
+    tabela_teste["c_slope"] = kmeans.cluster_centers_[kmeans.labels_, 5]
+    tabela_sort = tabela_teste.sort_values(by=["P", "V", "SG"], ascending=False)
 
     return tabela_sort
