@@ -362,8 +362,11 @@ def createTabelaRegressaoMeioCampeonato():
 # Método utilizado para centralizar a criação das tabelas de previsão de dados (Regressão)
 def createAreaRegressao():
     st.subheader("Tabela de pontos finais.")
+    st.text('Tabela com os possíveis dados finais do campeonato')
     createTabelaRegressao()
     st.subheader("Tabela de pontos finais com dados da metade (rodada 19) em diante.")
+    st.text('Tabela com os possíveis dados finais do campeonato com a com dados da metade (rodada 19) em diante.')
+    st.text('Útil para identificar qual o time que se destacou da metade do campeonato em diante.')
     createTabelaRegressaoMeioCampeonato()
 
 
