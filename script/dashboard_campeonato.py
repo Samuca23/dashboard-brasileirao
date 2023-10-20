@@ -264,6 +264,7 @@ def createTableCluster():
     )
 
 
+# Método utilizado para criar a tabela de chances do time em cada grupo (clustes)
 def createTableChanceCluster():
     st.subheader("Chances dentro do Campeonato.")
     df_chance_pred = df_chance_cluster().copy()
@@ -306,6 +307,7 @@ def createTableChanceCluster():
     )
 
 
+# Método utilizado para a criação da tela de previsão dos dados (Regressão)
 def createTabelaRegressao():
     dadoTabelaClassificacao = calcular_regressao()
 
@@ -331,6 +333,7 @@ def createTabelaRegressao():
     )
 
 
+# Método utilizado para a criação da tela de previsão dos dados do meio do campeonato em diante (Regressão)
 def createTabelaRegressaoMeioCampeonato():
     dadoTabelaClassificacao = calcula_regressao_meio_campeonato()
 
@@ -356,6 +359,7 @@ def createTabelaRegressaoMeioCampeonato():
     )
 
 
+# Método utilizado para centralizar a criação das tabelas de previsão de dados (Regressão)
 def createAreaRegressao():
     st.subheader("Tabela de pontos finais.")
     createTabelaRegressao()
@@ -363,6 +367,7 @@ def createAreaRegressao():
     createTabelaRegressaoMeioCampeonato()
 
 
+# Método utilizado para tratando dos valores para porcentagem
 def trataValorPorcentagemTime(valor):
     retorno = valor * 100
 
