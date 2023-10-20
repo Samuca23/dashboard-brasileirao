@@ -12,7 +12,7 @@ from dados import (
     calcula_regressao_cluster,
 )
 
-
+# Método responsável pela criação do select com os times
 def createSelecboxTime():
     times = getAllTimes()
     st.header("Estatísticas do Time.")
@@ -29,7 +29,7 @@ def createSelecboxTime():
 def createDashboardTime(sigla):
     montaPainelTime(sigla)
 
-
+# Método utializado por retornar a tabela de classificação
 def getDadoTabelaClassificacao(bAddClomunCluster=False):
     iClassificacao = 0
     for i in tabela_sort["Time"]:
@@ -91,7 +91,7 @@ def montaPainelTime(sigla):
         box_shadow=True,
     )
 
-
+# Método utilizado para criar o painel de informações do time
 def createPainelInfoTime(sigla):
     tabela = getDadoTabelaClassificacao()
     index_of_sigla = tabela.index[tabela["Time"] == sigla].tolist()[0]
@@ -117,7 +117,7 @@ def createPainelInfoTime(sigla):
     card_gol_con.metric("Gols Contra", tabela.loc[index_of_sigla, "GC"])
     card_saldo_gol.metric("Saldo de Gols", tabela.loc[index_of_sigla, "SG"])
 
-
+# Método utilizado para criar o painel de status do time dentro do campeonato
 def createPainelStatusCampeonato(sigla):
     st.subheader("Status no campeonato.")
 
@@ -141,7 +141,7 @@ def createPainelStatusCampeonato(sigla):
     card_derrota_visitante.metric("Derrota", dados_visitante["derrota"])
     card_empate_visitante.metric("Empate", dados_visitante["empate"])
 
-
+# Método responsável por calcular a quantidade de vitórias ou derrotas do time
 def calculaVitoriaDerrotaEmpate(dado_jogo, bVisitante=False):
     retorno = {}
     retorno["vitoria"] = 0
@@ -164,7 +164,7 @@ def calculaVitoriaDerrotaEmpate(dado_jogo, bVisitante=False):
 
     return retorno
 
-
+# Método utilizado para criar o painel de Chances do time dentro de campeonato
 def createPainelChancesCampeonato(index_of_sigla, df_chance_pred):
     st.subheader("Chances no campeonato.")
     libertadores = trataValorDashboardTime(df_chance_pred.loc[index_of_sigla, "cl_o"])
@@ -186,7 +186,7 @@ def createPainelChancesCampeonato(index_of_sigla, df_chance_pred):
     card_limbo.metric("Limbo", f"{limbo}%")
     card_rebaixamento.metric("Rebaixamento", f"{rebaixamento}%")
 
-
+# Método utilizado para criar o painel de possíveis dados final do time
 def createPainelRegressaoTime(sigla):
     dadoTabelaClassificacao = calcular_regressao()
     index_of_sigla = dadoTabelaClassificacao.index[
@@ -229,6 +229,6 @@ def trataValorDashboardTime(valor):
 
     return round(retorno)
 
-
+# Método para a criação dos dashboards individuais do time
 def mainDashboardTime():
     createSelecboxTime()
