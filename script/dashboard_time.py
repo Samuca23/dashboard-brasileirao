@@ -95,7 +95,7 @@ def montaPainelTime(sigla):
 def createPainelInfoTime(sigla):
     tabela = getDadoTabelaClassificacao()
     index_of_sigla = tabela.index[tabela["Time"] == sigla].tolist()[0]
-    st.subheader("Status da classificação.")
+    st.subheader("Dados da classificação.")
     (
         card_classificacao,
         card_ponto,
@@ -166,7 +166,7 @@ def calculaVitoriaDerrotaEmpate(dado_jogo, bVisitante=False):
 
 
 def createPainelChancesCampeonato(index_of_sigla, df_chance_pred):
-    st.subheader("Chances dentro do campeonato.")
+    st.subheader("Chances no campeonato.")
     libertadores = trataValorDashboardTime(df_chance_pred.loc[index_of_sigla, "cl_o"])
     limbo = trataValorDashboardTime(df_chance_pred.loc[index_of_sigla, "cl_1"])
     rebaixamento = trataValorDashboardTime(df_chance_pred.loc[index_of_sigla, "cl_2"])
