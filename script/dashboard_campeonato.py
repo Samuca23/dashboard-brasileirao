@@ -190,10 +190,9 @@ def createTableCluster():
         by=["Pontos", "Vit", "Saldo"], ascending=False
     )
     colocacao = list(tabela_atual["Time"])
-    # domain = [1, 2, 3, 4, 5]
     domain = ["Rebaixamento", "Limbo", "Sul-Americana", "Libertadores", "Título"]
     range_color = ["red", "orange", "yellow", "green", "blue"]
-    opaco = ["black", "gray", "lightgray", "turquoise", "steelblue"]
+    opaco = ["#023999", "gray", "lightgray", "turquoise", "steelblue"]
 
     grafico_circle_1, grafico_circle_2 = st.columns(2)
 
