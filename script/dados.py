@@ -7,9 +7,11 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LinearRegression
 from sklearn.cluster import KMeans
 
+# Leitura dos dados do brasileirão
 brasileirao = pd.read_excel("../data/brasileirao2023.xlsx")
 brasileirao = brasileirao[brasileirao["Score_m"].notnull()]
 
+# Montagem dos primeiros dados necessários
 times = brasileirao["Mandante"].unique()
 tabela = pd.DataFrame()
 for time in times:
@@ -52,8 +54,6 @@ for time in times:
 tabela["P"] = (tabela["V"] * 3) + tabela["E"]
 tabela["SG"] = tabela["GP"] - tabela["GC"]
 tabela_sort = tabela.sort_values(by=["P", "V", "SG"], ascending=False)
-
-from sklearn.cluster import KMeans
 
 df_data = tabela[["P", "V", "E", "D", "SG"]]
 kmeans = KMeans(n_clusters=5, random_state=0).fit(df_data)
@@ -142,10 +142,12 @@ df_pred = tabela[
 df_pred = df_pred.copy()
 
 
+# Método para retornar a variável como uma cópia para que não sofra alterações
 def df_chance_cluster():
     return df_pred
 
 
+# Método para calcular a tabela
 def calcular_tabela(df):
     times = df["Mandante"].unique()
     tabela = []
@@ -183,6 +185,7 @@ def calcular_tabela(df):
     return tabela
 
 
+# Método para calcular os cluster
 def calcular_cluster(df):
     df_data = df[["Pontos", "Vit", "Emp", "Der", "Saldo"]]
     kmeans = KMeans(n_clusters=5, random_state=0, n_init=5).fit(df_data)
@@ -222,59 +225,12 @@ def getSiglaTimeFromNome(nome):
     return sgila_time
 
 
+# Método para retornar as rodadas do campeonato
 def getAllRodadaCampeonato():
     rodada = brasileirao["Rodada"]
 
 
-def calcular_tabela(df):
-    times = df["Mandante"].unique()
-    tabela = []
-    for time in times:
-        vit = emp = der = pro = con = jog = 0
-        mandante = df[df["Mandante"] == time]
-        for indice, partida in mandante.iterrows():
-            if partida["Score_m"] > partida["Score_v"]:
-                vit += 1
-            elif partida["Score_m"] == partida["Score_v"]:
-                emp += 1
-            else:
-                der += 1
-            pro += partida["Score_m"]
-            con += partida["Score_v"]
-            jog += 1
-        visitante = df[df["Visitante"] == time]
-        for indice, partida in visitante.iterrows():
-            if partida["Score_v"] > partida["Score_m"]:
-                vit += 1
-            elif partida["Score_v"] == partida["Score_m"]:
-                emp += 1
-            else:
-                der += 1
-            pro += partida["Score_v"]
-            con += partida["Score_m"]
-            jog += 1
-        tabela.insert(0, [time, jog, vit, emp, der, pro, con])
-    tabela = pd.DataFrame(
-        tabela, columns=["Time", "Jogos", "Vit", "Emp", "Der", "GPro", "GCon"]
-    )
-    tabela["Pontos"] = (tabela["Vit"] * 3) + tabela["Emp"]
-    tabela["Saldo"] = tabela["GPro"] - tabela["GCon"]
-
-    return tabela
-
-
-def calcular_cluster(df):
-    df_data = df[["Pontos", "Vit", "Emp", "Der", "Saldo"]]
-    kmeans = KMeans(n_clusters=5, random_state=0, n_init=5).fit(df_data)
-    df["Cluster"] = kmeans.labels_
-    cl = pd.DataFrame(kmeans.cluster_centers_[:, 0], columns=["Media"]).reset_index()
-    cl["Ranking"] = cl["Media"].rank()
-    cl = cl.rename(columns={"index": "Cluster"})
-    df = df.merge(cl, on="Cluster", how="left")
-
-    return df
-
-
+# Método para calcular a regressão
 def calcula_pontuacao_regressao():
     rodadas = brasileirao["Rodada"].unique()
     times = brasileirao["Mandante"].unique()
@@ -349,6 +305,7 @@ def calcular_regressao():
     return df_regressao.sort_values(by="pontuacao_final", ascending=False)
 
 
+# Método para calcular a regressão da metado do campeonato
 def calcula_regressao_meio_campeonato():
     pt_pontuacao_cum = calcula_pontuacao_regressao()
     pontuacao_2 = pt_pontuacao_cum[pt_pontuacao_cum["rodada"] > 19]
@@ -380,6 +337,7 @@ def calcula_regressao_meio_campeonato():
     return df_regressao.sort_values(by="pontuacao_final", ascending=False)
 
 
+# Método para calcular a regressão do cluster
 def calcula_regressao_cluster():
     df_regressao = calcular_regressao()
     tabela_teste = tabela.merge(
