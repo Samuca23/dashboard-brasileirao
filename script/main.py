@@ -5,6 +5,7 @@ import streamlit_authenticator as stauth
 from dashboard_campeonato import createDashboardCampeonato
 from dashboard_time import mainDashboardTime
 
+st.set_page_config(layout="wide")
 
 with open('./config.yaml') as file:
     config = yaml.load(file, Loader=SafeLoader)
@@ -21,7 +22,6 @@ authenticator = stauth.Authenticate(
 name, authenticator_status, username = authenticator.login("Login", "main")
 
 def main():
-    st.set_page_config(layout="wide")
     tabs = ["Campeonato", "Time"]
     authenticator.logout("Logout", "sidebar")
     st.sidebar.title("Campeonato Brasileiro 2023 - Série A")
@@ -38,7 +38,7 @@ if authenticator_status == False:
 if authenticator_status == None:
     st.warning("Please enter your username and password")
 
-if authenticator_status:
+if authenticator_status == True:
     if __name__ == "__main__":
         main()
 
