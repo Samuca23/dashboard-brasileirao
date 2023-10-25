@@ -6,11 +6,12 @@ from dashboard_campeonato import createDashboardCampeonato
 from dashboard_time import mainDashboardTime
 
 st.set_page_config(layout="wide")
+st.title("Campeonato Brasileiro 2023 - Série A")
 
 with open('./config.yaml') as file:
     config = yaml.load(file, Loader=SafeLoader)
 
-hashed_passwords = stauth.Hasher(['abc', 'def']).generate()
+hashed_passwords = stauth.Hasher(['admin']).generate()
 authenticator = stauth.Authenticate(
     config['credentials'],
     config['cookie']['name'],
@@ -23,9 +24,9 @@ name, authenticator_status, username = authenticator.login("Login", "main")
 
 def main():
     tabs = ["Campeonato", "Time"]
-    authenticator.logout("Logout", "sidebar")
     st.sidebar.title("Campeonato Brasileiro 2023 - Série A")
     selected = st.sidebar.selectbox("Selecione uma visualização", tabs)
+    authenticator.logout("Logout", "sidebar")
 
     if selected == "Campeonato":
         createDashboardCampeonato()

@@ -17,7 +17,7 @@ from dados import (
 
 # Método para retornar a tabela de Classificação.
 def getDadoTabelaClassificacao(bAddClomunCluster=False):
-    classificacao = tabela_sort[["Time", "P", "J", "V", "E", "D", "GP", "GC", "SG"]]
+    classificacao = tabela_sort[["Time", "J", "P", "V", "E", "D", "GP", "GC", "SG"]]
     classificacao["GP"] = classificacao["GP"].astype(int)
     classificacao["GC"] = classificacao["GC"].astype(int)
     classificacao["SG"] = classificacao["SG"].astype(int)
@@ -90,7 +90,7 @@ def createTabelaClassificacao():
         ] = f"{iClassificacao}º"
 
     dadoTabelaClassificacao = dadoTabelaClassificacao[
-        ["Classificação", "Time", "P", "J", "V", "E", "D", "GP", "GC", "SG"]
+        ["Classificação", "Time", "J", "P", "V", "E", "D", "GP", "GC", "SG"]
     ]
 
     if progresso:
@@ -266,15 +266,15 @@ def createTableCluster():
 
 # Método utilizado para criar a tabela de chances do time em cada grupo (clustes)
 def createTableChanceCluster():
-    st.subheader("Chances dentro do Campeonato.")
+    st.subheader("Chances de grupos.")
     df_chance_pred = df_chance_cluster().copy()
     df_chance_pred.rename(
         columns={
-            "cl_o": "Libertadores",
-            "cl_1": "Limbo",
-            "cl_2": "Rebaixamento",
-            "cl_3": "Título",
-            "cl_4": "Sul-Americana",
+            "cl_o": "Rebaixamento",
+            "cl_1": "Sul-Americana",
+            "cl_2": "Libertadores",
+            "cl_3": "Limbo",
+            "cl_4": "Título",
         },
         inplace=True,
     )
@@ -335,7 +335,8 @@ def createTabelaRegressao():
 
 # Método utilizado para a criação da tela de previsão dos dados do meio do campeonato em diante (Regressão)
 def createTabelaRegressaoMeioCampeonato():
-    dadoTabelaClassificacao = calcula_regressao_meio_campeonato()
+    rodada_inicial = st.slider("Rodada", min_value=1, max_value=38, value=19)
+    dadoTabelaClassificacao = calcula_regressao_meio_campeonato(rodada_inicial)
 
     iClassificacao = 0
     for i in dadoTabelaClassificacao["time"]:
@@ -364,9 +365,7 @@ def createAreaRegressao():
     st.subheader("Tabela de pontos finais.")
     st.text('Tabela com os possíveis dados finais do campeonato')
     createTabelaRegressao()
-    st.subheader("Tabela de pontos finais com dados da metade (rodada 19) em diante.")
-    st.text('Tabela com os possíveis dados finais do campeonato com a com dados da metade (rodada 19) em diante.')
-    st.text('Útil para identificar qual o time que se destacou da metade do campeonato em diante.')
+    st.subheader("Tabela com possibilidade de mudança das rodadas")
     createTabelaRegressaoMeioCampeonato()
 
 
@@ -390,7 +389,7 @@ def createDashboardCampeonato():
             "Campeonato e Classificação",
             "Classificação - Grupo",
             "Classificação - Previsão",
-            "Chances dentro do Campeonato",
+            "Chances de Grupos",
         ]
     )
 

@@ -306,9 +306,9 @@ def calcular_regressao():
 
 
 # Método para calcular a regressão da metado do campeonato
-def calcula_regressao_meio_campeonato():
+def calcula_regressao_meio_campeonato(iRodada):
     pt_pontuacao_cum = calcula_pontuacao_regressao()
-    pontuacao_2 = pt_pontuacao_cum[pt_pontuacao_cum["rodada"] > 19]
+    pontuacao_2 = pt_pontuacao_cum[pt_pontuacao_cum["rodada"] > iRodada]
     colunas = pontuacao_2.columns
     df_regressao = pd.DataFrame()
     colunas = pontuacao_2.columns

@@ -172,12 +172,12 @@ def calculaVitoriaDerrotaEmpate(dado_jogo, bVisitante=False):
 
 # Método utilizado para criar o painel de Chances do time dentro de campeonato
 def createPainelChancesCampeonato(index_of_sigla, df_chance_pred):
-    st.subheader("Chances no campeonato.")
-    libertadores = trataValorDashboardTime(df_chance_pred.loc[index_of_sigla, "cl_o"])
-    limbo = trataValorDashboardTime(df_chance_pred.loc[index_of_sigla, "cl_1"])
-    rebaixamento = trataValorDashboardTime(df_chance_pred.loc[index_of_sigla, "cl_2"])
-    titulo = trataValorDashboardTime(df_chance_pred.loc[index_of_sigla, "cl_3"])
-    sulAmericana = trataValorDashboardTime(df_chance_pred.loc[index_of_sigla, "cl_4"])
+    st.subheader("Chances de grupos.")
+    rebaixamento = trataValorDashboardTime(df_chance_pred.loc[index_of_sigla, "cl_o"])
+    sulAmericana = trataValorDashboardTime(df_chance_pred.loc[index_of_sigla, "cl_1"])
+    libertadores = trataValorDashboardTime(df_chance_pred.loc[index_of_sigla, "cl_2"])
+    limbo = trataValorDashboardTime(df_chance_pred.loc[index_of_sigla, "cl_3"])
+    titulo = trataValorDashboardTime(df_chance_pred.loc[index_of_sigla, "cl_4"])
 
     (
         card_titulo,
