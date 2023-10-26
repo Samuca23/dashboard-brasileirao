@@ -1,7 +1,4 @@
 import pandas as pd
-import numpy as np
-import streamlit as st
-import matplotlib.pyplot as plt
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LinearRegression
@@ -9,6 +6,8 @@ from sklearn.cluster import KMeans
 
 # Leitura dos dados do brasileirão
 brasileirao = pd.read_excel("../data/brasileirao2023.xlsx")
+
+# Limpeza dos dados Nulos
 brasileirao = brasileirao[brasileirao["Score_m"].notnull()]
 
 # Montagem dos primeiros dados necessários
