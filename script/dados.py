@@ -7,6 +7,8 @@ from sklearn.cluster import KMeans
 # Leitura dos dados do brasileirão
 brasileirao = pd.read_excel("../data/brasileirao2023.xlsx")
 
+brasileirao_all = brasileirao.copy()
+
 # Limpeza dos dados Nulos
 brasileirao = brasileirao[brasileirao["Score_m"].notnull()]
 

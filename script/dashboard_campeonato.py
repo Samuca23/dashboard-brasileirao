@@ -12,6 +12,8 @@ from dados import (
     calcular_regressao,
     calcula_regressao_meio_campeonato,
     df_chance_cluster,
+    brasileirao_all,
+    brasileirao,
 )
 
 
@@ -363,10 +365,47 @@ def createTabelaRegressaoMeioCampeonato():
 # Método utilizado para centralizar a criação das tabelas de previsão de dados (Regressão)
 def createAreaRegressao():
     st.subheader("Tabela de pontos finais.")
-    st.text('Tabela com os possíveis dados finais do campeonato')
+    st.text("Tabela com os possíveis dados finais do campeonato")
     createTabelaRegressao()
     st.subheader("Tabela com possibilidade de mudança das rodadas")
     createTabelaRegressaoMeioCampeonato()
+
+
+def createTableJogos():
+    selecao = st.radio("Filtros", ["Todos jogos", "Disputados", "Por Rodada"], horizontal=True)
+
+    if selecao == "Todos jogos":
+        brasileirao_all_copy = brasileirao_all.copy()
+        brasileirao_all_copy = brasileirao_all_copy.drop("Temporada", axis=1)
+        st.dataframe(
+            brasileirao_all_copy,
+            height=1000,
+            hide_index=True,
+            use_container_width=True
+        )
+    elif selecao == "Disputados":
+        brasileirao_copy = brasileirao.copy()
+        brasileirao_copy = brasileirao_copy.drop("Temporada", axis=1)
+        st.dataframe(
+            brasileirao_copy,
+            height=750,
+            hide_index=True,
+            use_container_width=True
+        )
+    elif selecao == "Por Rodada":
+        rodada = st.slider(
+            "Rodada", min_value=1, max_value=brasileirao["Rodada"].max(), value=1
+        )
+
+    if selecao == "Por Rodada" and rodada:
+        brasileirao_all_copy = brasileirao_all.copy()
+        brasileirao_all_copy = brasileirao_all_copy.drop("Temporada", axis=1)
+        st.dataframe(
+            brasileirao_all_copy[brasileirao_all_copy["Rodada"] == rodada],
+            height=400,
+            hide_index=True,
+            use_container_width=True
+        )
 
 
 # Método utilizado para tratando dos valores para porcentagem
@@ -381,15 +420,17 @@ def createDashboardCampeonato():
     st.header("Campeonato Brasileiro 2023.")
     (
         painel_campeonato,
+        jogos,
         classificao_grupo,
         classificacao_regressao,
-        chances_campeonato,
+        chances_campeonato
     ) = st.tabs(
         [
             "Campeonato e Classificação",
+            "Jogos",
             "Classificação - Grupo",
             "Classificação - Previsão",
-            "Chances de Grupos",
+            "Chances de Grupos"
         ]
     )
 
@@ -403,3 +444,5 @@ def createDashboardCampeonato():
         createAreaRegressao()
     with chances_campeonato:
         createTableChanceCluster()
+    with jogos:
+        createTableJogos()
