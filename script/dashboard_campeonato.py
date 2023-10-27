@@ -372,25 +372,21 @@ def createAreaRegressao():
 
 
 def createTableJogos():
-    selecao = st.radio("Filtros", ["Todos jogos", "Disputados", "Por Rodada"], horizontal=True)
+    selecao = st.radio(
+        "Filtros", ["Todos jogos", "Disputados", "Por Rodada"], horizontal=True
+    )
 
     if selecao == "Todos jogos":
         brasileirao_all_copy = brasileirao_all.copy()
         brasileirao_all_copy = brasileirao_all_copy.drop("Temporada", axis=1)
         st.dataframe(
-            brasileirao_all_copy,
-            height=1000,
-            hide_index=True,
-            use_container_width=True
+            brasileirao_all_copy, height=1000, hide_index=True, use_container_width=True
         )
     elif selecao == "Disputados":
         brasileirao_copy = brasileirao.copy()
         brasileirao_copy = brasileirao_copy.drop("Temporada", axis=1)
         st.dataframe(
-            brasileirao_copy,
-            height=750,
-            hide_index=True,
-            use_container_width=True
+            brasileirao_copy, height=750, hide_index=True, use_container_width=True
         )
     elif selecao == "Por Rodada":
         rodada = st.slider(
@@ -404,7 +400,7 @@ def createTableJogos():
             brasileirao_all_copy[brasileirao_all_copy["Rodada"] == rodada],
             height=400,
             hide_index=True,
-            use_container_width=True
+            use_container_width=True,
         )
 
 
@@ -423,14 +419,14 @@ def createDashboardCampeonato():
         jogos,
         classificao_grupo,
         classificacao_regressao,
-        chances_campeonato
+        chances_campeonato,
     ) = st.tabs(
         [
             "Campeonato e Classificação",
             "Jogos",
             "Classificação - Grupo",
             "Classificação - Previsão",
-            "Chances de Grupos"
+            "Chances de Grupos",
         ]
     )
 
