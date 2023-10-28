@@ -81,7 +81,7 @@ def createPainelCampeonato():
 # Método utilizado para criar a tabela de Classificação
 def createTabelaClassificacao():
     st.subheader("Classificação Brasileirão 2023.")
-    progresso = st.toggle("Progresso dos dados")
+    progresso = st.toggle("Progresso dos dados 📈")
     dadoTabelaClassificacao = getDadoTabelaClassificacao()
 
     iClassificacao = 0
@@ -155,7 +155,7 @@ def createTableClassificacaoGrupo():
 
 # Método para criar os gráficos de desempenho dos time durante o campeonato
 def createTableCluster():
-    st.subheader("Gráficos de desempenho dos times durante o campeonato.")
+    st.subheader("Gráficos de desempenho dos times durante o campeonato. 📉")
     rodada_inicial = st.slider("Rodada", min_value=2, max_value=38, value=10)
     clusters = []
     for rodada in range(
@@ -364,8 +364,7 @@ def createTabelaRegressaoMeioCampeonato():
 
 # Método utilizado para centralizar a criação das tabelas de previsão de dados (Regressão)
 def createAreaRegressao():
-    st.subheader("Tabela de pontos finais.")
-    st.text("Tabela com os possíveis dados finais do campeonato")
+    st.subheader("Tabela de possíveis pontos finais. 🏆")
     createTabelaRegressao()
     st.subheader("Tabela com possibilidade de mudança das rodadas")
     createTabelaRegressaoMeioCampeonato()
@@ -425,6 +424,7 @@ def createTableJogos():
 
 # Método para criar a tabela de alteração de resultados
 def createEditResultado():
+    st.text("Essa ação é disponível somente para Administradores.")
     dados_editados = st.data_editor(
         brasileirao_all,
         column_config={
@@ -466,16 +466,16 @@ def createDashboardCampeonato():
         painel_campeonato,
         classificao_grupo,
         classificacao_regressao,
-        jogos,
         chances_campeonato,
+        jogos,
         resultados
     ) = st.tabs(
         [
             "Campeonato e Classificação",
             "Classificação - Grupo",
             "Classificação - Previsão",
-            "Jogos",
             "Chances de Grupos",
+            "Jogos",
             "Resultados"
         ]
     )
