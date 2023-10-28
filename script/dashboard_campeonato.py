@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
+import numpy as np
 from streamlit_extras.metric_cards import style_metric_cards
 from dados import (
     tabela_sort,
@@ -13,7 +14,6 @@ from dados import (
     calcula_regressao_meio_campeonato,
     df_chance_cluster,
     brasileirao_all,
-    brasileirao,
 )
 
 
@@ -370,39 +370,88 @@ def createAreaRegressao():
     st.subheader("Tabela com possibilidade de mudança das rodadas")
     createTabelaRegressaoMeioCampeonato()
 
-
+# Método criado para exibir os jogos
 def createTableJogos():
     selecao = st.radio(
-        "Filtros", ["Todos jogos", "Disputados", "Por Rodada"], horizontal=True
+        "Filtros", ["Por rodada", "Disputados", "Todos jogos"], horizontal=True
     )
 
     if selecao == "Todos jogos":
         brasileirao_all_copy = brasileirao_all.copy()
         brasileirao_all_copy = brasileirao_all_copy.drop("Temporada", axis=1)
-        st.dataframe(
-            brasileirao_all_copy, height=1000, hide_index=True, use_container_width=True
-        )
+        rodada = 0
+        for index, row in brasileirao_all.iterrows():
+            if np.isnan(row['Score_m']):
+                score_m = 'null'
+                score_v = 'null'
+            else:
+                score_m = int(row['Score_m'])
+                score_v = int(row['Score_v'])
+            if rodada == 0 | rodada != row["Rodada"]:
+                rodada = row["Rodada"]
+                st.subheader(f"")
+                st.divider()
+                st.subheader(f"Rodada: {row['Rodada']}")
+            st.markdown(f"{row['Mandante']}  {score_m}  x  {score_v}  {row['Visitante']}")
     elif selecao == "Disputados":
         brasileirao_copy = brasileirao.copy()
-        brasileirao_copy = brasileirao_copy.drop("Temporada", axis=1)
-        st.dataframe(
-            brasileirao_copy, height=750, hide_index=True, use_container_width=True
-        )
-    elif selecao == "Por Rodada":
+        rodada = 0
+        for index, row in brasileirao_copy.iterrows():
+            if np.isnan(row['Score_m']):
+                score_m = 'null'
+                score_v = 'null'
+            else:
+                score_m = int(row['Score_m'])
+                score_v = int(row['Score_v'])
+            if rodada == 0 | rodada != row["Rodada"]:
+                rodada = row["Rodada"]
+                st.subheader(f"")
+                st.divider()
+                st.subheader(f"Rodada: {row['Rodada']}")
+            st.markdown(f"{row['Mandante']}  {score_m}  x  {score_v}  {row['Visitante']}")
+    elif selecao == "Por rodada":
         rodada = st.slider(
             "Rodada", min_value=1, max_value=brasileirao["Rodada"].max(), value=1
         )
 
-    if selecao == "Por Rodada" and rodada:
-        brasileirao_all_copy = brasileirao_all.copy()
-        brasileirao_all_copy = brasileirao_all_copy.drop("Temporada", axis=1)
-        st.dataframe(
-            brasileirao_all_copy[brasileirao_all_copy["Rodada"] == rodada],
-            height=400,
-            hide_index=True,
-            use_container_width=True,
-        )
+        if selecao == "Por rodada" and rodada:
+            brasileirao_all_copy = brasileirao_all.copy()
+            brasileirao_all_copy = brasileirao_all_copy.drop("Temporada", axis=1)
+            st.subheader(f"Rodada: {rodada}")
+            for index, row in brasileirao_all_copy[brasileirao_all_copy["Rodada"] == rodada].iterrows():
+                score_m = int(row['Score_m'])
+                score_v = int(row['Score_v'])                               
+                st.markdown(f"{row['Mandante']}  {score_m}  x  {score_v}  {row['Visitante']}")
 
+# Método para criar a tabela de alteração de resultados
+def createEditResultado():
+    dados_editados = st.data_editor(
+        brasileirao_all,
+        column_config={
+            "Score_m": st.column_config.NumberColumn(
+                "Placar Mandante",
+                help="Gols marcados pelo Mandante",
+                format="%f",
+                min_value=0,
+                max_value=5,
+                width='medium'
+            ),
+            "Score_v": st.column_config.NumberColumn(
+                "Placar Visitante",
+                help="Gols marcados pelo Visitante",
+                format="%f",
+                min_value=0,
+                max_value=5,
+                width='medium'
+            ),
+        },
+        disabled=["Temporada", "Rodada", "Mandante", "Visitante"],
+        hide_index=True,
+        key='data_editor'
+    )
+    if len(st.session_state["data_editor"]["edited_rows"]) > 0:
+        if st.button('Salvar dados...'):
+            dados_editados.to_excel('../data/brasileirao2023.xlsx', index=False)
 
 # Método utilizado para tratando dos valores para porcentagem
 def trataValorPorcentagemTime(valor):
@@ -413,20 +462,21 @@ def trataValorPorcentagemTime(valor):
 
 # Método utilizado para criar o Dashboard do campeonato
 def createDashboardCampeonato():
-    st.header("Campeonato Brasileiro 2023.")
     (
         painel_campeonato,
-        jogos,
         classificao_grupo,
         classificacao_regressao,
+        jogos,
         chances_campeonato,
+        resultados
     ) = st.tabs(
         [
             "Campeonato e Classificação",
-            "Jogos",
             "Classificação - Grupo",
             "Classificação - Previsão",
+            "Jogos",
             "Chances de Grupos",
+            "Resultados"
         ]
     )
 
@@ -442,3 +492,5 @@ def createDashboardCampeonato():
         createTableChanceCluster()
     with jogos:
         createTableJogos()
+    with resultados:
+        createEditResultado()
