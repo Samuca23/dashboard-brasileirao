@@ -9,6 +9,8 @@ brasileirao = pd.read_excel("../data/brasileirao2023.xlsx")
 
 brasileirao_all = brasileirao.copy()
 
+brasileirao_all_not_copy = brasileirao
+
 # Limpeza dos dados Nulos
 brasileirao = brasileirao[brasileirao["Score_m"].notnull()]
 

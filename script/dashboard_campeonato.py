@@ -14,6 +14,7 @@ from dados import (
     calcula_regressao_meio_campeonato,
     df_chance_cluster,
     brasileirao_all,
+    brasileirao_all_not_copy
 )
 
 
@@ -44,16 +45,18 @@ def getClassificaoGrupo():
 def createPainelCampeonato():
     st.subheader("Dados do campeonato.")
     card_total_jogo, card_total_gols, card_total_ponto, card_media_gol = st.columns(4)
-    card_primeiro_colocado, card_time_mais_gol = st.columns(2)
+    card_primeiro_colocado, card_ultimo_colocado, card_time_mais_gol, card_time_menos_gol = st.columns(4)
     total_gol = int(brasileirao["Score_m"].sum() + brasileirao["Score_v"].sum())
     total_ponto = tabela_sort["P"].sum()
-    time_mais_gol = getNomeTimeFromSigla(
-        tabela_sort[tabela_sort["GP"].notnull().sort_values(ascending=False)][
-            "Time"
-        ].iloc[0]
-    )
-    primeiro_colocado = getDadoTabelaClassificacao().iloc[0]
+    time_mais_gol = getDadoTabelaClassificacao().sort_values("GP", ascending=False).iloc[0]
+    time_menos_gol = getDadoTabelaClassificacao().sort_values("GP", ascending=True).iloc[0]
+    nome_time_mais_gol = getNomeTimeFromSigla(time_mais_gol["Time"])
+    nome_time_menos_gol = getNomeTimeFromSigla(time_menos_gol["Time"])
+    
+    primeiro_colocado = getDadoTabelaClassificacao().sort_values("P", ascending=False).iloc[0]
+    ultimo_colocado = getDadoTabelaClassificacao().sort_values("P", ascending=True).iloc[0]
     nome_primeiro_colocado = getNomeTimeFromSigla(primeiro_colocado["Time"])
+    nome_ultimo_colocado = getNomeTimeFromSigla(ultimo_colocado["Time"])
     total_rodada_jogada = (
         brasileirao[brasileirao["Score_m"].notnull()]["Rodada"].unique().max()
     )
@@ -67,7 +70,9 @@ def createPainelCampeonato():
     card_total_ponto.metric("Total de pontos", total_ponto)
     card_media_gol.metric("Média de gol por rodada", round(media_gol_rodada))
     card_primeiro_colocado.metric("Primeiro colocado", nome_primeiro_colocado)
-    card_time_mais_gol.metric("Time com mais gols", time_mais_gol)
+    card_ultimo_colocado.metric("Último Colocado", nome_ultimo_colocado)
+    card_time_mais_gol.metric("Time com mais gols", nome_time_mais_gol)
+    card_time_menos_gol.metric("Time com menos gols", nome_time_menos_gol)
     style_metric_cards(
         border_left_color="#4fb342",
         background_color="#F0F2F6",
@@ -426,7 +431,7 @@ def createTableJogos():
 def createEditResultado():
     st.text("Essa ação é disponível somente para Administradores.")
     dados_editados = st.data_editor(
-        brasileirao_all,
+        brasileirao_all_not_copy,
         column_config={
             "Score_m": st.column_config.NumberColumn(
                 "Placar Mandante",
