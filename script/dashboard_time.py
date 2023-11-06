@@ -137,23 +137,36 @@ def createPainelStatusCampeonato(sigla):
     metrica = st.toggle("Métrica")
     st.text("Mandante")
     card_vitorias_mandante, card_derrota_mandante, card_empate_mandante = st.columns(3)
-    data_mandante = {"Valor":[ dados_mandante["vitoria"],  dados_mandante["derrota"],  dados_mandante["empate"]], "Status": ["Vitória", "Derrota", "Empate"]}
+    data_mandante = {
+        "Valor": [
+            dados_mandante["vitoria"],
+            dados_mandante["derrota"],
+            dados_mandante["empate"],
+        ],
+        "Status": ["Vitória", "Derrota", "Empate"],
+    }
     st.bar_chart(pd.DataFrame(data_mandante), x="Status", y="Valor", color="#19540F")
     if metrica:
         card_vitorias_mandante.metric("Vitória", dados_mandante["vitoria"])
         card_derrota_mandante.metric("Derrota", dados_mandante["derrota"])
         card_empate_mandante.metric("Empate", dados_mandante["empate"])
     st.text("Visitante")
-    card_vitoria_visitante, card_derrota_visitante, card_empate_visitante = st.columns(3)
-    data_visitante = {"Valor":[ dados_visitante["vitoria"],  dados_visitante["derrota"],  dados_visitante["empate"]], "Status": ["Vitória", "Derrota", "Empate"]}
+    card_vitoria_visitante, card_derrota_visitante, card_empate_visitante = st.columns(
+        3
+    )
+    data_visitante = {
+        "Valor": [
+            dados_visitante["vitoria"],
+            dados_visitante["derrota"],
+            dados_visitante["empate"],
+        ],
+        "Status": ["Vitória", "Derrota", "Empate"],
+    }
     st.bar_chart(pd.DataFrame(data_visitante), x="Status", y="Valor", color="#19540F")
     if metrica:
         card_vitoria_visitante.metric("Vitória", dados_visitante["vitoria"])
         card_derrota_visitante.metric("Derrota", dados_visitante["derrota"])
         card_empate_visitante.metric("Empate", dados_visitante["empate"])
-
-
-
 
 
 # Método responsável por calcular a quantidade de vitórias ou derrotas do time
@@ -196,7 +209,7 @@ def createPainelChancesCampeonato(index_of_sigla, df_chance_pred):
         card_limbo,
         card_rebaixamento,
     ) = st.columns(5)
-    metric = st.toggle("Métricas")
+    bar_chart = st.toggle("Gráfico de Barra")
     line_chart = st.toggle("Gráfico de Linha")
 
     data = {
@@ -204,19 +217,18 @@ def createPainelChancesCampeonato(index_of_sigla, df_chance_pred):
         "Grupos": ["Rebaixamento", "Sul-Americana", "Liberatdores", "Limbo", "Título"],
     }
 
-    if metric:
-        card_titulo.metric("Título", f"{titulo}%")
-        card_libertadores.metric("Libertadores", f"{libertadores}%")
-        card_sul_americada.metric("Sul-Americana", f"{sulAmericana}%")
-        card_limbo.metric("Limbo", f"{limbo}%")
-        card_rebaixamento.metric("Rebaixamento", f"{rebaixamento}%")
+    card_titulo.metric("Título", f"{titulo}%")
+    card_libertadores.metric("Libertadores", f"{libertadores}%")
+    card_sul_americada.metric("Sul-Americana", f"{sulAmericana}%")
+    card_limbo.metric("Limbo", f"{limbo}%")
+    card_rebaixamento.metric("Rebaixamento", f"{rebaixamento}%")
+    if bar_chart:
+        st.bar_chart(pd.DataFrame(data), x="Grupos", y="%", color="#4fb342", height=500)
 
     if line_chart:
         st.line_chart(
             pd.DataFrame(data), x="Grupos", y="%", color="#19540F", height=500
         )
-
-    st.bar_chart(pd.DataFrame(data), x="Grupos", y="%", color="#4fb342", height=500)
 
 
 # Método utilizado para criar o painel de possíveis dados final do time
