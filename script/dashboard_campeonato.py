@@ -14,7 +14,7 @@ from dados import (
     calcula_regressao_meio_campeonato,
     df_chance_cluster,
     brasileirao_all,
-    brasileirao_all_not_copy
+    brasileirao_all_not_copy,
 )
 
 
@@ -45,16 +45,29 @@ def getClassificaoGrupo():
 def createPainelCampeonato():
     st.subheader("Dados do campeonato.")
     card_total_jogo, card_total_gols, card_total_ponto, card_media_gol = st.columns(4)
-    card_primeiro_colocado, card_ultimo_colocado, card_time_mais_gol, card_time_menos_gol = st.columns(4)
+    (
+        card_primeiro_colocado,
+        card_ultimo_colocado,
+        card_time_mais_gol,
+        card_time_menos_gol,
+    ) = st.columns(4)
     total_gol = int(brasileirao["Score_m"].sum() + brasileirao["Score_v"].sum())
     total_ponto = tabela_sort["P"].sum()
-    time_mais_gol = getDadoTabelaClassificacao().sort_values("GP", ascending=False).iloc[0]
-    time_menos_gol = getDadoTabelaClassificacao().sort_values("GP", ascending=True).iloc[0]
+    time_mais_gol = (
+        getDadoTabelaClassificacao().sort_values("GP", ascending=False).iloc[0]
+    )
+    time_menos_gol = (
+        getDadoTabelaClassificacao().sort_values("GP", ascending=True).iloc[0]
+    )
     nome_time_mais_gol = getNomeTimeFromSigla(time_mais_gol["Time"])
     nome_time_menos_gol = getNomeTimeFromSigla(time_menos_gol["Time"])
-    
-    primeiro_colocado = getDadoTabelaClassificacao().sort_values("P", ascending=False).iloc[0]
-    ultimo_colocado = getDadoTabelaClassificacao().sort_values("P", ascending=True).iloc[0]
+
+    primeiro_colocado = (
+        getDadoTabelaClassificacao().sort_values("P", ascending=False).iloc[0]
+    )
+    ultimo_colocado = (
+        getDadoTabelaClassificacao().sort_values("P", ascending=True).iloc[0]
+    )
     nome_primeiro_colocado = getNomeTimeFromSigla(primeiro_colocado["Time"])
     nome_ultimo_colocado = getNomeTimeFromSigla(ultimo_colocado["Time"])
     total_rodada_jogada = (
@@ -149,6 +162,7 @@ def createTabelaClassificacao():
 # Método utilizado para criar a tabela de Classificação com Grupo
 def createTableClassificacaoGrupo():
     st.subheader("Classificação Brasileirão 2023 por Grupo.")
+    st.text("")
     opcao = st.selectbox("Escolha o Grupo", (df_cluster_grupo["grupo"]))
     classificacaoGrupo = getClassificaoGrupo()
     st.dataframe(
@@ -161,7 +175,12 @@ def createTableClassificacaoGrupo():
 # Método para criar os gráficos de desempenho dos time durante o campeonato
 def createTableCluster():
     st.subheader("Gráficos de desempenho dos times durante o campeonato. 📉")
-    rodada_inicial = st.slider("Rodada", min_value=2, max_value=38, value=10)
+    st.text(
+        "Estes gráficos apresentam a passam dos times entre os grupos conforme a passagem das rodadas."
+    )
+    rodada_inicial = rodada = st.slider(
+        "Rodada", min_value=2, max_value=brasileirao["Rodada"].max(), value=10
+    )
     clusters = []
     for rodada in range(
         rodada_inicial,
@@ -235,7 +254,7 @@ def createTableCluster():
             ],
         )
     )
-    base = alt.Chart(clusters, title="Brasileirao - Heatmap ponto").encode(
+    base = alt.Chart(clusters, title="Brasileirao - Gráfico 4").encode(
         x="Rodada:O", y=alt.Y("Time:O", sort=colocacao)
     )
     heatmap = base.mark_rect().encode(
@@ -253,7 +272,7 @@ def createTableCluster():
     heatmap_ponit.altair_chart(heatmap + text)
 
     heatmap_no_ponit.altair_chart(
-        alt.Chart(clusters, title="Brasileirao - Heatmap")
+        alt.Chart(clusters, title="Brasileirao - Gráfico 3")
         .mark_rect()
         .encode(
             x="Rodada:O",
@@ -273,15 +292,16 @@ def createTableCluster():
 
 # Método utilizado para criar a tabela de chances do time em cada grupo (clustes)
 def createTableChanceCluster():
-    st.subheader("Chances de grupos.")
+    st.subheader("Chances de permanecer no grupo.")
+    st.text("As chances do time permanecer um cada grupo.")
     df_chance_pred = df_chance_cluster().copy()
     df_chance_pred.rename(
         columns={
-            "cl_o": "Rebaixamento",
-            "cl_1": "Sul-Americana",
-            "cl_2": "Libertadores",
-            "cl_3": "Limbo",
-            "cl_4": "Título",
+            "cl_o": "Limbo",
+            "cl_1": "Título",
+            "cl_2": "Sul-Americana",
+            "cl_3": "Rebaixamento",
+            "cl_4": "Libertadores",
         },
         inplace=True,
     )
@@ -342,7 +362,9 @@ def createTabelaRegressao():
 
 # Método utilizado para a criação da tela de previsão dos dados do meio do campeonato em diante (Regressão)
 def createTabelaRegressaoMeioCampeonato():
-    rodada_inicial = st.slider("Rodada", min_value=1, max_value=38, value=19)
+    rodada_inicial = rodada = st.slider(
+        "Rodada", min_value=1, max_value=brasileirao["Rodada"].max(), value=10
+    )
     dadoTabelaClassificacao = calcula_regressao_meio_campeonato(rodada_inicial)
 
     iClassificacao = 0
@@ -369,10 +391,15 @@ def createTabelaRegressaoMeioCampeonato():
 
 # Método utilizado para centralizar a criação das tabelas de previsão de dados (Regressão)
 def createAreaRegressao():
-    st.subheader("Tabela de possíveis pontos finais. 🏆")
+    st.subheader("Projeção da pontuação final. 🏆")
+    st.text("Nesta tabela é apresentado a estimativa de pontuação final do campeonato.")
     createTabelaRegressao()
-    st.subheader("Tabela com possibilidade de mudança das rodadas")
+    st.subheader("Tabela com possibilidade de mudança das rodadas. 📋")
+    st.text(
+        "Os ponto são calculados a partir da rodada selecionada ignorando todas rodadas anteriores."
+    )
     createTabelaRegressaoMeioCampeonato()
+
 
 # Método criado para exibir os jogos
 def createTableJogos():
@@ -385,34 +412,38 @@ def createTableJogos():
         brasileirao_all_copy = brasileirao_all_copy.drop("Temporada", axis=1)
         rodada = 0
         for index, row in brasileirao_all.iterrows():
-            if np.isnan(row['Score_m']):
-                score_m = 'null'
-                score_v = 'null'
+            if np.isnan(row["Score_m"]):
+                score_m = "null"
+                score_v = "null"
             else:
-                score_m = int(row['Score_m'])
-                score_v = int(row['Score_v'])
+                score_m = int(row["Score_m"])
+                score_v = int(row["Score_v"])
             if rodada == 0 | rodada != row["Rodada"]:
                 rodada = row["Rodada"]
                 st.subheader(f"")
                 st.divider()
                 st.subheader(f"Rodada: {row['Rodada']}")
-            st.markdown(f"{row['Mandante']}  {score_m}  x  {score_v}  {row['Visitante']}")
+            st.markdown(
+                f"{row['Mandante']}  {score_m}  x  {score_v}  {row['Visitante']}"
+            )
     elif selecao == "Disputados":
         brasileirao_copy = brasileirao.copy()
         rodada = 0
         for index, row in brasileirao_copy.iterrows():
-            if np.isnan(row['Score_m']):
-                score_m = 'null'
-                score_v = 'null'
+            if np.isnan(row["Score_m"]):
+                score_m = "null"
+                score_v = "null"
             else:
-                score_m = int(row['Score_m'])
-                score_v = int(row['Score_v'])
+                score_m = int(row["Score_m"])
+                score_v = int(row["Score_v"])
             if rodada == 0 | rodada != row["Rodada"]:
                 rodada = row["Rodada"]
                 st.subheader(f"")
                 st.divider()
                 st.subheader(f"Rodada: {row['Rodada']}")
-            st.markdown(f"{row['Mandante']}  {score_m}  x  {score_v}  {row['Visitante']}")
+            st.markdown(
+                f"{row['Mandante']}  {score_m}  x  {score_v}  {row['Visitante']}"
+            )
     elif selecao == "Por rodada":
         rodada = st.slider(
             "Rodada", min_value=1, max_value=brasileirao["Rodada"].max(), value=1
@@ -422,10 +453,15 @@ def createTableJogos():
             brasileirao_all_copy = brasileirao_all.copy()
             brasileirao_all_copy = brasileirao_all_copy.drop("Temporada", axis=1)
             st.subheader(f"Rodada: {rodada}")
-            for index, row in brasileirao_all_copy[brasileirao_all_copy["Rodada"] == rodada].iterrows():
-                score_m = int(row['Score_m'])
-                score_v = int(row['Score_v'])                               
-                st.markdown(f"{row['Mandante']}  {score_m}  x  {score_v}  {row['Visitante']}")
+            for index, row in brasileirao_all_copy[
+                brasileirao_all_copy["Rodada"] == rodada
+            ].iterrows():
+                score_m = int(row["Score_m"])
+                score_v = int(row["Score_v"])
+                st.markdown(
+                    f"{row['Mandante']}  {score_m}  x  {score_v}  {row['Visitante']}"
+                )
+
 
 # Método para criar a tabela de alteração de resultados
 def createEditResultado():
@@ -439,7 +475,7 @@ def createEditResultado():
                 format="%f",
                 min_value=0,
                 max_value=5,
-                width='medium'
+                width="medium",
             ),
             "Score_v": st.column_config.NumberColumn(
                 "Placar Visitante",
@@ -447,16 +483,17 @@ def createEditResultado():
                 format="%f",
                 min_value=0,
                 max_value=5,
-                width='medium'
+                width="medium",
             ),
         },
         disabled=["Temporada", "Rodada", "Mandante", "Visitante"],
         hide_index=True,
-        key='data_editor'
+        key="data_editor",
     )
     if len(st.session_state["data_editor"]["edited_rows"]) > 0:
-        if st.button('Salvar dados...'):
-            dados_editados.to_excel('../data/brasileirao2023.xlsx', index=False)
+        if st.button("Salvar dados..."):
+            dados_editados.to_excel("../data/brasileirao2023.xlsx", index=False)
+
 
 # Método utilizado para tratando dos valores para porcentagem
 def trataValorPorcentagemTime(valor):
@@ -473,7 +510,7 @@ def createDashboardCampeonato():
         classificacao_regressao,
         chances_campeonato,
         jogos,
-        resultados
+        resultados,
     ) = st.tabs(
         [
             "Campeonato e Classificação",
@@ -481,7 +518,7 @@ def createDashboardCampeonato():
             "Classificação - Previsão",
             "Chances de Grupos",
             "Jogos",
-            "Resultados"
+            "Resultados",
         ]
     )
 
@@ -497,5 +534,5 @@ def createDashboardCampeonato():
         createTableChanceCluster()
     with jogos:
         createTableJogos()
-    with resultados:
-        createEditResultado()
+    # with resultados:
+    # createEditResultado()

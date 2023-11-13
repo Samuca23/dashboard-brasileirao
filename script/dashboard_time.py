@@ -72,8 +72,8 @@ def montaPainelTime(sigla):
         [
             "Dados da Classificação",
             "Status Campeonado",
-            "Chances no Campeonato",
-            "Previsão final",
+            "Chances de Permanecer nos Grupos",
+            "Previsão Final",
         ]
     )
 
@@ -101,6 +101,7 @@ def createPainelInfoTime(sigla):
     tabela = getDadoTabelaClassificacao()
     index_of_sigla = tabela.index[tabela["Time"] == sigla].tolist()[0]
     st.subheader("Dados da classificação.")
+    st.text("Informações que são apresentadas na tabela de classificação.")
     (
         card_classificacao,
         card_ponto,
@@ -126,6 +127,7 @@ def createPainelInfoTime(sigla):
 # Método utilizado para criar o painel de status do time dentro do campeonato
 def createPainelStatusCampeonato(sigla):
     st.subheader("Status no campeonato.")
+    st.text("Status de vitória, empate e derrota como mandate e visitante.")
 
     dado_jogos = brasileirao.copy()
     dado_jogo_time_mandante = dado_jogos[dado_jogos["Mandante"] == sigla]
@@ -196,6 +198,7 @@ def calculaVitoriaDerrotaEmpate(dado_jogo, bVisitante=False):
 # Método utilizado para criar o painel de Chances do time dentro de campeonato
 def createPainelChancesCampeonato(index_of_sigla, df_chance_pred):
     st.subheader("Chances de grupos.")
+    st.text("As chances do time permanecer em cada grupo.")
     rebaixamento = trataValorDashboardTime(df_chance_pred.loc[index_of_sigla, "cl_o"])
     sulAmericana = trataValorDashboardTime(df_chance_pred.loc[index_of_sigla, "cl_1"])
     libertadores = trataValorDashboardTime(df_chance_pred.loc[index_of_sigla, "cl_2"])
@@ -249,7 +252,7 @@ def createPainelRegressaoTime(sigla):
         ["Classificação", "time", "pontuacao_final", "intercept", "slope"]
     ]
 
-    st.subheader("Previsão final do time no campeonato")
+    st.subheader("Previsão final do time no campeonato. 🥇")
     card_classificacao, card_ponto, card_grupo = st.columns(3)
     card_classificacao.metric(
         "Classificação",
