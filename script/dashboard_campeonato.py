@@ -100,6 +100,7 @@ def createPainelCampeonato():
 def createTabelaClassificacao():
     st.subheader("Classificação Brasileirão 2023.")
     progresso = st.toggle("Progresso dos dados 📈")
+    st.markdown("Legenda: **J**: Jogos | **P**: Pontos | **V**: Vitória | **E**: Empates | **D**: Derrotas | **GP**: Gol Pró | **GC**: Gol Contra | **SG**: Saldo de Gol")
     dadoTabelaClassificacao = getDadoTabelaClassificacao()
 
     iClassificacao = 0
@@ -162,9 +163,10 @@ def createTabelaClassificacao():
 # Método utilizado para criar a tabela de Classificação com Grupo
 def createTableClassificacaoGrupo():
     st.subheader("Classificação Brasileirão 2023 por Grupo.")
-    st.text("")
+    st.text("Times que estão presentes nos grupos.")
     opcao = st.selectbox("Escolha o Grupo", (df_cluster_grupo["grupo"]))
     classificacaoGrupo = getClassificaoGrupo()
+    st.markdown("Lenda: **J**: Jogos | **P**: Pontos | **V**: Vitória | **E**: Empates | **D**: Derrotas | **GP**: Gol Pró | **GC**: Gol Contra | **SG**: Saldo de Gol")
     st.dataframe(
         classificacaoGrupo[classificacaoGrupo["Grupo"] == opcao],
         hide_index=True,
