@@ -15,6 +15,7 @@ from dados import (
     df_chance_cluster,
     brasileirao_all,
     brasileirao_all_not_copy,
+    getAllTimes
 )
 
 
@@ -102,14 +103,16 @@ def createTabelaClassificacao():
     progresso = st.toggle("Progresso dos dados 📈")
     st.markdown("Legenda: **J**: Jogos | **P**: Pontos | **V**: Vitória | **E**: Empates | **D**: Derrotas | **GP**: Gol Pró | **GC**: Gol Contra | **SG**: Saldo de Gol")
     dadoTabelaClassificacao = getDadoTabelaClassificacao()
+    times_descricao = getAllTimes()
 
     iClassificacao = 0
     for i in dadoTabelaClassificacao["Time"]:
         iClassificacao += 1
+        # dadoTabelaClassificacao["Time Descrição"] = time_descricao_completa["Time"]
         dadoTabelaClassificacao.loc[
             dadoTabelaClassificacao["Time"] == i, "Classificação"
         ] = f"{iClassificacao}º"
-
+       
     dadoTabelaClassificacao = dadoTabelaClassificacao[
         ["Classificação", "Time", "J", "P", "V", "E", "D", "GP", "GC", "SG"]
     ]
