@@ -302,11 +302,11 @@ def createTableChanceCluster():
     df_chance_pred = df_chance_cluster().copy()
     df_chance_pred.rename(
         columns={
-            "cl_o": "Limbo",
-            "cl_1": "Título",
-            "cl_2": "Sul-Americana",
-            "cl_3": "Rebaixamento",
-            "cl_4": "Libertadores",
+            "cl_o": "Libertadores",
+            "cl_1": "Rebaixamento",
+            "cl_2": "Título",
+            "cl_3": "Limbo",
+            "cl_4": "Sul-Americana",
         },
         inplace=True,
     )
@@ -325,7 +325,7 @@ def createTableChanceCluster():
         ["Time", "Título", "Libertadores", "Sul-Americana", "Limbo", "Rebaixamento"]
     ]
     st.dataframe(
-        df_chance_pred.sort_values(by="Título", ascending=False),
+        df_chance_pred.sort_values(by=["Título", "Libertadores", "Sul-Americana", "Limbo", "Rebaixamento"], ascending=False),
         hide_index=True,
         height=750,
         use_container_width=True,
@@ -539,5 +539,5 @@ def createDashboardCampeonato():
         createTableChanceCluster()
     with jogos:
         createTableJogos()
-    # with resultados:
-    # createEditResultado()
+    with resultados:
+        createEditResultado()
